@@ -6,13 +6,15 @@ const height = canvas.height;
 let lastTime = 0;
 let lastFrameTime = 0;
 const frameRate = 8; // Frames per second for animation
+let gameover = false;
 
 let tileSize = 64;
 const grid_rows = Math.floor(height / tileSize ) + 4;
 const grid_cols = 5;
-
 const sprite_w = 32; // Width of a single frame
 const sprite_h = 32; // Height of a single frame
+
+
 const player = {
     x: width / 2 - tileSize / 2,
     y: height - tileSize - 20,
@@ -23,6 +25,7 @@ const player = {
     frameY: 1,
     moving: true,
     direction: 'up',
+    score: 0,
 };
 
 function createRoadSegment(tileCount, threshold=0.5)
@@ -86,13 +89,19 @@ async function loadAssets() {
 async function startGame()
 {
   assets = await loadAssets();
-  console.log(assets);
-  //ctx.drawImage(assets.background, 0, 0, width, height);
-  // ctx.drawImage(assets.idle, 0, 0, 64, 64, player.x, player.y, player.width, player.height);
   requestAnimationFrame(gameLoop);
 }
 
 startGame();
+function isGameOver()
+{
+  let playerCol = Math.floor((player.x + player.width / 2 - (map.x - map.width / 2)) / tileSize);
+  let playerRow = Math.floor((player.y + player.height - (map.y - map.height / 2)) / tileSize);
+  if (playerRow < 0 || playerRow >= grid_rows || playerCol < 0 || playerCol >= grid_cols)
+    return true;
+  return map.tiles[playerRow][playerCol] === 'obstacle';
+}
+
 
 function gameLoop()
 {
@@ -102,7 +111,7 @@ function gameLoop()
 
   update(delta);
   render();
-
+  if (gameover) return;
   requestAnimationFrame(gameLoop);
 }
 
@@ -116,6 +125,7 @@ function update(deltaTime)
     let threshold = empty ? 1 : Math.max(0.6, 1 - Math.random());
     map.tiles.pop()
     map.tiles.unshift(createRoadSegment(grid_cols, threshold));
+    player.score += 1;
   }
   if (map.y >= height / 2 + tileSize)
     map.y = height / 2;
@@ -126,17 +136,48 @@ function update(deltaTime)
     player.x += player.speed * deltaTime;
     if (player.x + player.width > map.x + map.width / 2) player.x = map.x + map.width / 2 - player.width;
   }
+  if (isGameOver())
+    gameover = true;
 }
 
 function render() {
   ctx.clearRect(0, 0, width, height);
-  drawGrid();
-  update_animation_frame();
-  if (player.moving) {
-    ctx.drawImage(assets.walk, player.frameX * sprite_w, 1 + player.frameY * sprite_h, sprite_w, sprite_h, player.x, player.y, player.width, player.height);
-  } else {
-    ctx.drawImage(assets.idle, player.frameX * sprite_w, 1 + player.frameY * sprite_h, sprite_w, sprite_h, player.x, player.y, player.width, player.height);
+  if (gameover)
+  {
+    drawEndScreen();
+    return;
   }
+
+  drawGrid();
+  drawPlayer();
+  drawScore();
+}
+
+function drawScore() {
+  ctx.fillStyle = '#000';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText(`Score: ${player.score}`, 10, 30);
+}
+
+function drawPlayer()
+{
+  update_animation_frame();
+  ctx.drawImage(
+    assets.walk, player.frameX * sprite_w, 1 + player.frameY * sprite_h,
+    sprite_w,sprite_h,player.x, player.y, player.width, player.height);
+}
+
+function drawEndScreen() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#fff';
+  ctx.font = '48px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Game Over', width / 2, height / 2);
+  ctx.font = '24px Arial';
+  ctx.fillText(`Final Score: ${player.score}`, width / 2, height / 2 + 40);
+  ctx.fillText('Press F5 to Restart', width / 2, height / 2 + 80);
 }
 
 let previous_direction = null;
