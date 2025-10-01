@@ -1,4 +1,5 @@
 import { animation, assetManager } from "./animation.js";
+import { idleState, runningState, jumpingState, duckingState } from "./playerState.js";
 
 
 
@@ -9,15 +10,16 @@ const height = canvas.height;
 
 
 let assetsManager = assetManager();
-let animations = () => {
-    animations['idle1'] = animation('idle1', 64, 64, 12);
+let loadAnimations = () => {
+    let animations = {};
+    animations['idle'] = animation('idle1', 64, 64, 12);
     animations['idle2'] = animation('idle2', 64, 64, 12);
     animations['idle3'] = animation('idle3', 64, 64, 12);
     animations['idle4'] = animation('idle4', 64, 64, 21);
     animations['walk'] = animation('walk', 64, 64, 17);
-    animations['run'] = animation('run', 64, 64, 12);
-    animations['jump'] = animation('jump', 64, 64, 15);
-    animations['duck'] = animation('duck', 64, 64, 6);
+    animations['running'] = animation('run', 64, 64, 12);
+    animations['jumping'] = animation('jump', 64, 64, 15);
+    animations['ducking'] = animation('duck', 64, 64, 6);
     animations['hurt'] = animation('hurt', 64, 64, 4);
     animations['shield_out'] = animation('shield_out', 64, 64, 7);
     animations['shield_in'] = animation('shield_in', 64, 64, 7);
@@ -25,18 +27,28 @@ let animations = () => {
     return animations;
 };
 
+function loadStates(player)
+{
+    const states = {};
+    states['idle'] = idleState(player);
+    states['running'] = runningState(player);
+    states['jumping'] = jumpingState(player);
+    states['ducking'] = duckingState(player);
+    return states;
+}
+
 let player = {
     x: width / 2 - 32,
     y: height / 2 - 32,
+    xVelocity: 0,
+    yVelocity: 0,
+    direction: 'right',
+    groundY: height / 2 - 32,
     hitbox_w: 64,
     hitbox_h: 64,
-    speed: 200,
+    speed: 16,
     state: 'idle',
-    moving: false,
-    shield: false,
-    direction: 'right',
-    anim_id: 'duck',
-    anim: animations(),
+    states: {},
 }
 
 const FPS = 12;
@@ -59,6 +71,9 @@ async function startGame()
     assetsManager.addAsset('shield_in', 'sprites/shield_in_64_7.png');
     assetsManager.addAsset('shield_walk', 'sprites/shield_walk_64_6.png');
     await assetsManager.loadAssets();
+
+    player.animations = loadAnimations();
+    player.states = loadStates(player);
     requestAnimationFrame(gameLoop);    
 }
 
@@ -79,25 +94,12 @@ function gameLoop(timestamp)
 
 function update(deltaTime)
 {
-    updateAnimationFrame();
+    updatePlayer(deltaTime);
 }
 
-function updateAnimationFrame()
+function updatePlayer(deltaTime)
 {
-    updateIdleAnimation();    
-}
-
-function updateIdleAnimation()
-{
-    let finished = player.anim[player.anim_id].update();
-    // if (finished)
-    // {
-    //     if (player.anim_id === 'idle1')
-    //         player.anim_id = Math.random() < 0.05 ? 'idle' + (Math.floor(Math.random() * 3) + 2) : 'idle1';
-    //     else
-    //         player.anim_id = 'idle1';
-    // }
-
+    player.states[player.state].update();
 }
 
 function draw()
@@ -106,14 +108,35 @@ function draw()
     drawPlayer();
 }
 
+function drawPoint(x, y)
+{
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+}
+
 function drawPlayer()
 {
     ctx.save();
-    if (player.direction == 'right')
-        ctx.setTransform(-1, 0, 0, 1, width, 0);
-    let frame = player.anim[player.anim_id].getSpriteFrame();
-    ctx.drawImage(assetsManager.getAsset(frame.sprite_name), frame.x, frame.y, frame.width, frame.height, player.x + frame.offsetX, player.y + frame.offsetY, frame.width, frame.height);
+    console.log(player.state);
+    let frame = player.animations[player.state].getSpriteFrame();
+    ctx.translate(player.x + frame.width / 2, player.y + frame.height / 2);
+    if (player.direction == 'left')
+        ctx.scale(-1, 1);
+    ctx.drawImage(assetsManager.getAsset(frame.sprite_name), 
+            frame.x, frame.y, frame.width, frame.height, 
+            -frame.width / 2 + frame.offsetX, -frame.height / 2 + frame.offsetY, frame.width, frame.height);
     ctx.restore();
 }
 
 startGame();
+
+window.addEventListener('keydown', function(e) {
+    player.states[player.state].handleInput(e.code);
+});
+
+window.addEventListener('keyup', function(e) {
+    player.states[player.state].handleInput(null);
+});

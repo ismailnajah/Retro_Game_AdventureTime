@@ -41,12 +41,16 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _offsetX = 0, _o
 
     let currentFrame = 0;
 
-    let update = function() {
+    const update = function() {
         currentFrame = (currentFrame + 1) % frameCount;
         return currentFrame === 0;
     }
 
-    let getSpriteFrame = function() {
+    const reset = function() {
+        currentFrame = 0;
+    }
+
+    const getSpriteFrame = function() {
         return {
             sprite_name: sprite_name,
             x: currentFrame * frameW,
@@ -60,6 +64,7 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _offsetX = 0, _o
 
     return {
         update: update,
+        reset: reset,
         getSpriteFrame: getSpriteFrame,
     };
 }
