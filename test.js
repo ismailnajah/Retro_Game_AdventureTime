@@ -39,11 +39,10 @@ function loadStates(player)
 
 let player = {
     x: width / 2 - 32,
-    y: height / 2 - 32,
+    y: height - 63 - 64,
     xVelocity: 0,
     yVelocity: 0,
     direction: 'right',
-    groundY: height / 2 - 32,
     hitbox_w: 64,
     hitbox_h: 64,
     speed: 16,
@@ -72,6 +71,7 @@ async function startGame()
     assetsManager.addAsset('shield_walk', 'sprites/shield_walk_64_6.png');
     await assetsManager.loadAssets();
 
+    player.groundY = player.y;
     player.animations = loadAnimations();
     player.states = loadStates(player);
     requestAnimationFrame(gameLoop);    
@@ -117,8 +117,18 @@ function drawPoint(x, y)
     ctx.closePath();
 }
 
+function drawBackground()
+{
+    //draw ground
+    ctx.fillStyle = 'lightblue';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, height - 64, width, height - 64);
+}
+
 function drawPlayer()
 {
+    drawBackground();
     ctx.save();
     console.log(player.state);
     let frame = player.animations[player.state].getSpriteFrame();
