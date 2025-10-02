@@ -1,5 +1,5 @@
 import { animation, assetManager } from "./animation.js";
-import { idleState, runningState, jumpingState, duckingState } from "./playerState.js";
+import * as playerState from "./playerState.js";
 
 
 
@@ -18,7 +18,9 @@ let loadAnimations = () => {
     animations['idle4'] = animation('idle4', 64, 64, 21);
     animations['walk'] = animation('walk', 64, 64, 17);
     animations['running'] = animation('run', 64, 64, 12);
-    animations['jumping'] = animation('jump', 64, 64, 15);
+    animations['jumping'] = animation('jump', 64, 64, 5, false);
+    animations['falling'] = animation('fall', 64, 64, 5, false);
+    animations['landing'] = animation('land', 64, 64, 5, false);
     animations['ducking'] = animation('duck', 64, 64, 3, false);
     animations['hurt'] = animation('hurt', 64, 64, 4);
     animations['shield_out'] = animation('shield_out', 64, 64, 7);
@@ -30,10 +32,12 @@ let loadAnimations = () => {
 function loadStates(player)
 {
     const states = {};
-    states['idle'] = idleState(player);
-    states['running'] = runningState(player);
-    states['jumping'] = jumpingState(player);
-    states['ducking'] = duckingState(player);
+    states['idle']    = playerState.idleState(player);
+    states['running'] = playerState.runningState(player);
+    states['jumping'] = playerState.jumpingState(player);
+    states['falling'] = playerState.fallingState(player);
+    states['landing'] = playerState.landingState(player);
+    states['ducking'] = playerState.duckingState(player);
     return states;
 }
 
@@ -45,7 +49,7 @@ let player = {
     direction: 'right',
     hitbox_w: 64,
     hitbox_h: 64,
-    speed: 10,
+    speed: 8,
     state: 'idle',
     states: {},
 }
@@ -63,7 +67,9 @@ async function startGame()
     assetsManager.addAsset('idle4', 'sprites/idle4_64_21.png');
     assetsManager.addAsset('walk', 'sprites/walk_64_17.png');
     assetsManager.addAsset('run', 'sprites/run_64_12.png');
-    assetsManager.addAsset('jump', 'sprites/jump_64_15.png');
+    assetsManager.addAsset('jump', 'sprites/jump_64_5.png');
+    assetsManager.addAsset('fall', 'sprites/fall_64_5.png');
+    assetsManager.addAsset('land', 'sprites/land_64_5.png');
     assetsManager.addAsset('duck', 'sprites/duck_64_3.png');
     assetsManager.addAsset('hurt', 'sprites/hurt_64_4.png');
     assetsManager.addAsset('shield_out', 'sprites/shield_out_64_7.png');
@@ -143,11 +149,9 @@ function drawPlayer()
 startGame();
 
 window.addEventListener('keydown', function(e) {
-    console.log(`pressed ${e.code}`);
     player.states[player.state].onKeyDown(e.code);
 });
 
 window.addEventListener('keyup', function(e) {
-    console.log(`released ${e.code}`);
     player.states[player.state].onKeyUp(e.code);
 });

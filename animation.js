@@ -39,19 +39,23 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
 
     let offsetX = 0;
     let offsetY = 0;
+
     let repeated = _repeated;
     let reversed = false;
+    let paused = false;
 
     let currentFrame = 0;
 
     const update = function() {
         if (!repeated)
         {
-            if (reversed && currentFrame === 0)
+            if ( reversed && currentFrame === 0)
                 return true;
             if (!reversed && currentFrame === frameCount - 1)
                 return true;
         }
+        if (paused)
+            return false;
         currentFrame = (currentFrame + (reversed ? -1 : 1) ) % frameCount;
     }
 
@@ -62,6 +66,14 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
 
     const reverse = function() {
         reversed = !reversed;
+    }
+
+    const pause = function() {
+        paused = true;
+    }
+
+    const resume = function() {
+        paused = false;
     }
 
     const getSpriteFrame = function() {
@@ -80,6 +92,8 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
         update: update,
         reset: reset,
         reverse: reverse,
+        pause: pause,
+        resume: resume,
         getSpriteFrame: getSpriteFrame,
     };
 }

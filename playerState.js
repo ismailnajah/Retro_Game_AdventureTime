@@ -70,6 +70,7 @@ const runningState = (_player) => {
     {
         if (input !== 'ArrowRight' && input !== 'ArrowLeft')
             return;
+        player.xVelocity = 0;
         player.state = 'idle';
         player.states[player.state].enter();
     }
@@ -108,9 +109,8 @@ const runningState = (_player) => {
 
 const jumpingState = (_player) => {
     const player = _player;
-    let gravity = 8;
-    let maxHeight = 400;
-    const jumpStrength = 40;
+    let maxHeight = 150;
+    const jumpStrength = 20;
 
 
     //TODO: splite jumping into tree states: rising, falling, landing
@@ -118,22 +118,19 @@ const jumpingState = (_player) => {
     {
         player.yVelocity = -jumpStrength;
         player.animations['jumping'].reset();
-        maxHeight = 400;
+        maxHeight = 150;
     }
 
     function update()
     {
         player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
         player.y += player.yVelocity;
-        player.yVelocity += gravity;
         
-        const finished = player.animations['jumping'].update();
-
-        if (player.y >= player.groundY)
-            player.y = player.groundY;
-        if (finished)
+        player.animations['jumping'].update();
+        if (player.groundY - player.y >= maxHeight)
         {
-            player.state = 'idle';
+            player.y = player.groundY - maxHeight;
+            player.state = 'falling';
             player.states[player.state].enter();
         }
     }
@@ -142,26 +139,100 @@ const jumpingState = (_player) => {
     {
         if (input !== 'ArrowUp')
             return;
-        //cut jump short if key released early
-        //transition to falling state
+        player.state = 'falling';
+        player.states[player.state].enter();
     }
 
     function onKeyDown(input)
     {
-        switch (input)
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const fallingState = (_player) => {
+    const player = _player;
+    let gravity = 2;
+
+    function enter()
+    {
+        player.yVelocity = 0;
+        player.animations['falling'].reset();
+    }
+
+    function update()
+    {
+        player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
+        player.yVelocity += gravity;
+        player.y += player.yVelocity;
+        if (player.y >= player.groundY)
         {
-            case 'ArrowRight':
-                player.direction = 'right';
-                player.xVelocity = player.speed;
-                break;
-            case 'ArrowLeft':
-                player.direction = 'left';
-                player.xVelocity = player.speed;
-                break;
-            default:
-                player.xVelocity = 0;
-                break;
+            player.y = player.groundY;
+            player.state = player.xVelocity === 0 ? 'landing' : 'running';  
+            player.states[player.state].enter();
+
         }
+        player.animations['falling'].update();
+    }
+
+    function onKeyUp(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.xVelocity = 0; 
+    }
+    
+    function onKeyDown(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+        player.xVelocity = player.speed;
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const landingState = (_player) => {
+    const player = _player;
+    
+    function enter()
+    {
+        player.xVelocity = 0;
+        player.yVelocity = 0;
+        player.animations['landing'].reset();
+    }
+
+    function update()
+    {
+        const finished = player.animations['landing'].update();
+        if (finished)
+        {
+            player.state = 'idle';
+            player.states[player.state].enter();
+        }
+    }
+
+    function onKeyUp(input){}
+
+    function onKeyDown(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
     }
 
     return {
@@ -204,18 +275,9 @@ const duckingState = (_player) => {
 
     function onKeyDown(input)
     {
-        //TODO: i need to separate between keydown and keyup events
-        switch (input)
-        {
-            case 'ArrowRight':
-                player.direction = 'right';
-                break;
-            case 'ArrowLeft':
-                player.direction = 'left';
-                break;
-            default:
-                break;
-        }
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
     }
     return {
         enter: enter,
@@ -225,4 +287,4 @@ const duckingState = (_player) => {
     };
 }
 
-export { idleState, runningState, jumpingState, duckingState};
+export { idleState, runningState, jumpingState, fallingState, landingState, duckingState};
