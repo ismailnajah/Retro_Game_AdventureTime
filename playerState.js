@@ -12,7 +12,7 @@ const idleState = (_player) => {
         player.animations['idle'].update();
     }
 
-    function handleInput(input)
+    function onKeyDown(input)
     {
         switch (input)
         {
@@ -36,10 +36,15 @@ const idleState = (_player) => {
         if (player.state !== 'idle')
             player.states[player.state].enter();
     }
+
+    function onKeyUp(input)
+    {}
+
     return {
         enter: enter,
         update: update,
-        handleInput: handleInput,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
     };
 }
 
@@ -60,7 +65,16 @@ const runningState = (_player) => {
         player.animations['running'].update();
     }
 
-    function handleInput(input)
+
+    function onKeyUp(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return;
+        player.state = 'idle';
+        player.states[player.state].enter();
+    }
+
+    function onKeyDown(input)
     {
         switch (input)
         {
@@ -83,18 +97,20 @@ const runningState = (_player) => {
         if (player.state !== 'running')
             player.states[player.state].enter();
     }
+
     return {
         enter: enter,
         update: update,
-        handleInput: handleInput,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
     };
 }
 
 const jumpingState = (_player) => {
     const player = _player;
-    let gravity = 4;
-    let maxHeight = 150;
-    const jumpStrength = 16;
+    let gravity = 8;
+    let maxHeight = 400;
+    const jumpStrength = 40;
 
 
     //TODO: splite jumping into tree states: rising, falling, landing
@@ -102,7 +118,7 @@ const jumpingState = (_player) => {
     {
         player.yVelocity = -jumpStrength;
         player.animations['jumping'].reset();
-        maxHeight = 150;
+        maxHeight = 400;
     }
 
     function update()
@@ -122,7 +138,15 @@ const jumpingState = (_player) => {
         }
     }
 
-    function handleInput(input)
+    function onKeyUp(input)
+    {
+        if (input !== 'ArrowUp')
+            return;
+        //cut jump short if key released early
+        //transition to falling state
+    }
+
+    function onKeyDown(input)
     {
         switch (input)
         {
@@ -143,32 +167,42 @@ const jumpingState = (_player) => {
     return {
         enter: enter,
         update: update,
-        handleInput: handleInput,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
     };
 }
 
 const duckingState = (_player) => {
     const player = _player;
+    let standing = false;
 
     function enter()
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
+        standing = false;
         player.animations['ducking'].reset();
     }
 
     function update()
     {
-        //animation locked state, wait for animation to finish
         const finished = player.animations['ducking'].update();
-        if (finished)
+        if (standing && finished)
         {
             player.state = 'idle';
             player.states[player.state].enter();
         }
     }
 
-    function handleInput(input)
+    function onKeyUp(input)
+    {
+        if (input !== 'ArrowDown')
+            return;
+        player.animations['ducking'].reverse();
+        standing = true;
+    }
+
+    function onKeyDown(input)
     {
         //TODO: i need to separate between keydown and keyup events
         switch (input)
@@ -186,8 +220,9 @@ const duckingState = (_player) => {
     return {
         enter: enter,
         update: update,
-        handleInput: handleInput,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
     };
 }
 
-export { idleState, runningState, jumpingState, duckingState };
+export { idleState, runningState, jumpingState, duckingState};

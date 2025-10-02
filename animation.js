@@ -30,24 +30,38 @@ function assetManager()
     };
 }
 
-function animation(_sprite_name, _frameW, _frameH, _frameCount, _offsetX = 0, _offsetY = 0)
+function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true)
 {
     let sprite_name = _sprite_name;
+    let frameCount = _frameCount;
     let frameW = _frameW;
     let frameH = _frameH;
-    let frameCount = _frameCount;
-    let offsetX = _offsetX;
-    let offsetY = _offsetY;
+
+    let offsetX = 0;
+    let offsetY = 0;
+    let repeated = _repeated;
+    let reversed = false;
 
     let currentFrame = 0;
 
     const update = function() {
-        currentFrame = (currentFrame + 1) % frameCount;
-        return currentFrame === 0;
+        if (!repeated)
+        {
+            if (reversed && currentFrame === 0)
+                return true;
+            if (!reversed && currentFrame === frameCount - 1)
+                return true;
+        }
+        currentFrame = (currentFrame + (reversed ? -1 : 1) ) % frameCount;
     }
 
     const reset = function() {
         currentFrame = 0;
+        reversed = false;
+    }
+
+    const reverse = function() {
+        reversed = !reversed;
     }
 
     const getSpriteFrame = function() {
@@ -65,6 +79,7 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _offsetX = 0, _o
     return {
         update: update,
         reset: reset,
+        reverse: reverse,
         getSpriteFrame: getSpriteFrame,
     };
 }

@@ -1,215 +1,153 @@
+import { animation, assetManager } from "./animation.js";
+import { idleState, runningState, jumpingState, duckingState } from "./playerState.js";
+
+
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const width = canvas.width;
 const height = canvas.height;
 
-let lastTime = 0;
-let lastFrameTime = 0;
-const frameRate = 8; // Frames per second for animation
-let gameover = false;
 
-let tileSize = 64;
-const grid_rows = Math.floor(height / tileSize ) + 4;
-const grid_cols = 5;
-const sprite_w = 32; // Width of a single frame
-const sprite_h = 32; // Height of a single frame
-
-
-const player = {
-    x: width / 2 - tileSize / 2,
-    y: height - tileSize - 20,
-    width: tileSize,
-    height: tileSize,
-    speed: tileSize * 4,
-    frameX: 0,
-    frameY: 1,
-    moving: true,
-    direction: 'up',
-    score: 0,
+let assetsManager = assetManager();
+let loadAnimations = () => {
+    let animations = {};
+    animations['idle'] = animation('idle1', 64, 64, 12);
+    animations['idle2'] = animation('idle2', 64, 64, 12);
+    animations['idle3'] = animation('idle3', 64, 64, 12);
+    animations['idle4'] = animation('idle4', 64, 64, 21);
+    animations['walk'] = animation('walk', 64, 64, 17);
+    animations['running'] = animation('run', 64, 64, 12);
+    animations['jumping'] = animation('jump', 64, 64, 15);
+    animations['ducking'] = animation('duck', 64, 64, 3, false);
+    animations['hurt'] = animation('hurt', 64, 64, 4);
+    animations['shield_out'] = animation('shield_out', 64, 64, 7);
+    animations['shield_in'] = animation('shield_in', 64, 64, 7);
+    animations['shield_walk'] = animation('shield_walk', 64, 64, 6);
+    return animations;
 };
 
-function createRoadSegment(tileCount, threshold=0.5)
+function loadStates(player)
 {
-  let road = [];
-  for (let i = 0; i < tileCount; i++)
-    road.push(Math.random() < threshold ? 'road' : 'obstacle');
-  return road;
+    const states = {};
+    states['idle'] = idleState(player);
+    states['running'] = runningState(player);
+    states['jumping'] = jumpingState(player);
+    states['ducking'] = duckingState(player);
+    return states;
 }
 
-let map = (() => {
-  let g = [];
-  for (let r = 0; r < grid_rows; r++)
-    g.push(createRoadSegment(grid_cols, 1));
-  return {
-    x: width / 2,
-    y: height / 2,
-    width: grid_cols * tileSize,
-    height: grid_rows * tileSize,
-    tiles: g
-  };
-})();
-
-function drawGrid()
-{
-  for (let r = 0; r < grid_rows; r++)
-  {
-    for (let c = 0; c < grid_cols; c++)
-    {
-      if (map.tiles[r][c] === 'road')
-        ctx.fillStyle = '#888';
-      else
-        ctx.fillStyle = '#444';
-      let x = c * tileSize + map.x - map.width / 2;
-      let y = r * tileSize + map.y - map.height / 2;
-      ctx.fillRect(x, y, tileSize, tileSize);
-      ctx.strokeStyle = '#000';
-      ctx.strokeRect(x, y, tileSize, tileSize);
-    }
-  }
+let player = {
+    x: width / 2 - 32,
+    y: height - 63 - 64,
+    xVelocity: 0,
+    yVelocity: 0,
+    direction: 'right',
+    hitbox_w: 64,
+    hitbox_h: 64,
+    speed: 10,
+    state: 'idle',
+    states: {},
 }
 
-function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-async function loadAssets() {
-  const [idle, walk, background] = await Promise.all([
-    loadImage('assets/Idle.png'),
-    loadImage('assets/Walk.png'),
-    loadImage('assets/background.png'),
-  ]);
-  return { idle: idle, walk: walk, background: background };
-}
+const FPS = 24;
+const FIXED_DT = 1 / FPS; // fixed timestep in seconds
+let accumulator = 0;
+let lastTime = performance.now();
 
 async function startGame()
 {
-  assets = await loadAssets();
-  requestAnimationFrame(gameLoop);
+    assetsManager.addAsset('idle1', 'sprites/idle1_64_12.png');
+    assetsManager.addAsset('idle2', 'sprites/idle2_64_12.png');
+    assetsManager.addAsset('idle3', 'sprites/idle3_64_12.png');
+    assetsManager.addAsset('idle4', 'sprites/idle4_64_21.png');
+    assetsManager.addAsset('walk', 'sprites/walk_64_17.png');
+    assetsManager.addAsset('run', 'sprites/run_64_12.png');
+    assetsManager.addAsset('jump', 'sprites/jump_64_15.png');
+    assetsManager.addAsset('duck', 'sprites/duck_64_3.png');
+    assetsManager.addAsset('hurt', 'sprites/hurt_64_4.png');
+    assetsManager.addAsset('shield_out', 'sprites/shield_out_64_7.png');
+    assetsManager.addAsset('shield_in', 'sprites/shield_in_64_7.png');
+    assetsManager.addAsset('shield_walk', 'sprites/shield_walk_64_6.png');
+    await assetsManager.loadAssets();
+
+    player.groundY = player.y;
+    player.animations = loadAnimations();
+    player.states = loadStates(player);
+    requestAnimationFrame(gameLoop);    
 }
 
-startGame();
-function isGameOver()
+function gameLoop(timestamp)
 {
-  let playerCol = Math.floor((player.x + player.width / 2 - (map.x - map.width / 2)) / tileSize);
-  let playerRow = Math.floor((player.y + player.height - (map.y - map.height / 2)) / tileSize);
-  if (playerRow < 0 || playerRow >= grid_rows || playerCol < 0 || playerCol >= grid_cols)
-    return true;
-  return map.tiles[playerRow][playerCol] === 'obstacle';
+    let delta = (timestamp - lastTime) / 1000; // convert ms → seconds
+    lastTime = timestamp;
+    accumulator += delta;
+
+    // Run updates as many times as needed to catch up
+    while (accumulator >= FIXED_DT) {
+        update(FIXED_DT); // always update with fixed delta
+        accumulator -= FIXED_DT;
+    }
+    draw(); // render once per frame
+    requestAnimationFrame(gameLoop);
 }
 
-
-function gameLoop()
-{
-  const now = Date.now();
-  const delta = (now - lastTime) / 1000; // Convert to seconds
-  lastTime = now;
-
-  update(delta);
-  render();
-  if (gameover) return;
-  requestAnimationFrame(gameLoop);
-}
-
-let empty = false;
 function update(deltaTime)
 {
-  map.y += (player.speed / 2 * deltaTime);
-  if (map.y > height / 2 + tileSize)
-  {
-    empty = !empty;
-    let threshold = empty ? 1 : Math.max(0.6, 1 - Math.random());
-    map.tiles.pop()
-    map.tiles.unshift(createRoadSegment(grid_cols, threshold));
-    player.score += 1;
-  }
-  if (map.y >= height / 2 + tileSize)
-    map.y = height / 2;
-  if (player.direction === 'left') {
-    player.x -= player.speed * deltaTime;
-    if (player.x < map.x - map.width / 2) player.x = map.x - map.width / 2;
-  } else if (player.direction === 'right') {
-    player.x += player.speed * deltaTime;
-    if (player.x + player.width > map.x + map.width / 2) player.x = map.x + map.width / 2 - player.width;
-  }
-  if (isGameOver())
-    gameover = true;
+    updatePlayer(deltaTime);
 }
 
-function render() {
-  ctx.clearRect(0, 0, width, height);
-  if (gameover)
-  {
-    drawEndScreen();
-    return;
-  }
-
-  drawGrid();
-  drawPlayer();
-  drawScore();
+function updatePlayer(deltaTime)
+{
+    player.states[player.state].update();
 }
 
-function drawScore() {
-  ctx.fillStyle = '#000';
-  ctx.font = '24px Arial';
-  ctx.textAlign = 'left';
-  ctx.fillText(`Score: ${player.score}`, 10, 30);
+function draw()
+{
+    ctx.clearRect(0, 0, width, height);
+    drawPlayer();
+}
+
+function drawPoint(x, y)
+{
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawBackground()
+{
+    //draw ground
+    ctx.fillStyle = 'lightblue';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, height - 64, width, height - 64);
 }
 
 function drawPlayer()
 {
-  update_animation_frame();
-  ctx.drawImage(
-    assets.walk, player.frameX * sprite_w, 1 + player.frameY * sprite_h,
-    sprite_w,sprite_h,player.x, player.y, player.width, player.height);
+    drawBackground();
+    ctx.save();
+    let frame = player.animations[player.state].getSpriteFrame();
+    ctx.translate(player.x + frame.width / 2, player.y + frame.height / 2);
+    if (player.direction == 'left')
+        ctx.scale(-1, 1);
+    ctx.drawImage(assetsManager.getAsset(frame.sprite_name), 
+            frame.x, frame.y, frame.width, frame.height, 
+            -frame.width / 2 + frame.offsetX, -frame.height / 2 + frame.offsetY, frame.width, frame.height);
+    ctx.restore();
 }
 
-function drawEndScreen() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-  ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = '#fff';
-  ctx.font = '48px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Game Over', width / 2, height / 2);
-  ctx.font = '24px Arial';
-  ctx.fillText(`Final Score: ${player.score}`, width / 2, height / 2 + 40);
-  ctx.fillText('Press F5 to Restart', width / 2, height / 2 + 80);
-}
+startGame();
 
-let previous_direction = null;
-function update_animation_frame() {
-  let now = Date.now();
-  if (now - lastFrameTime < 1000 / frameRate && player.direction === previous_direction)
-    return;
-  
-  previous_direction = player.direction;
-  lastFrameTime = now;
-
-  if (player.moving) {
-    player.frameX = (player.frameX + 1) % 4; // Cycle through walk frames
-  } else {
-    player.frameX = (player.frameX + 1) % 2; // Reset to first frame of idle animation
-  }
-}
-
-document.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'ArrowLeft':
-            player.direction = 'left';
-            break;
-        case 'ArrowRight':
-            player.direction = 'right';
-            break;
-    }
-    player.moving = player.direction !== null;
+window.addEventListener('keydown', function(e) {
+    console.log(`pressed ${e.code}`);
+    player.states[player.state].onKeyDown(e.code);
 });
 
-document.addEventListener('keyup', (e) => {
-    player.moving = true;
-    player.direction = 'up';
-    player.frameX = 0; // Reset to first frame of idle animation
+window.addEventListener('keyup', function(e) {
+    console.log(`released ${e.code}`);
+    player.states[player.state].onKeyUp(e.code);
 });
