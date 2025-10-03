@@ -47,16 +47,17 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
     let currentFrame = 0;
 
     const update = function() {
-        if (!repeated)
-        {
-            if ( reversed && currentFrame === 0)
-                return true;
-            if (!reversed && currentFrame === frameCount - 1)
-                return true;
-        }
         if (paused)
-            return false;
-        currentFrame = (currentFrame + (reversed ? -1 : 1) ) % frameCount;
+            return ;//(currentFrame === 0 && !reversed) || (currentFrame === frameCount - 1 && reversed);
+
+        if (reversed)
+            currentFrame = (currentFrame - 1 >= 0 ) ? currentFrame - 1 : (repeated ? frameCount - 1 : 0);
+        else
+            currentFrame = (currentFrame + 1 < frameCount) ? currentFrame + 1 : (repeated ? 0 : frameCount - 1);
+    }
+
+    const finished = function() {
+        return (currentFrame === 0 && reversed) || (currentFrame === frameCount - 1 && !reversed);
     }
 
     const reset = function() {
@@ -94,6 +95,7 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
         reverse: reverse,
         pause: pause,
         resume: resume,
+        finished: finished,
         getSpriteFrame: getSpriteFrame,
     };
 }

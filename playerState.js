@@ -4,13 +4,11 @@ const idleState = (_player) => {
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.animations['idle'].reset();
+        player.setAnimationId('idle');
     }
 
     function update()
-    {
-        player.animations['idle'].update();
-    }
+    {}
 
     function onKeyDown(input)
     {
@@ -30,6 +28,9 @@ const idleState = (_player) => {
             case 'ArrowDown':
                 player.state = 'ducking';
                 break;
+            case 'KeyG':
+                player.state = 'shieldOut';
+                break;
             default:
                 break;
         }
@@ -48,7 +49,6 @@ const idleState = (_player) => {
     };
 }
 
-
 const runningState = (_player) => {
     const player = _player;
 
@@ -56,13 +56,12 @@ const runningState = (_player) => {
     {
         player.xVelocity = player.speed;
         player.yVelocity = 0;
-        player.animations['running'].reset();
+        player.setAnimationId('running');
     }
 
     function update()
     {
         player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
-        player.animations['running'].update();
     }
 
 
@@ -91,6 +90,9 @@ const runningState = (_player) => {
             case 'ArrowDown':
                 player.state = 'ducking';
                 break;
+            case 'KeyG':
+                player.state = 'shieldOut';
+                break;
             default:
                 player.state = 'idle';
                 break;
@@ -117,7 +119,7 @@ const jumpingState = (_player) => {
     function enter()
     {
         player.yVelocity = -jumpStrength;
-        player.animations['jumping'].reset();
+        player.setAnimationId('jumping');
         maxHeight = 150;
     }
 
@@ -126,7 +128,6 @@ const jumpingState = (_player) => {
         player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
         player.y += player.yVelocity;
         
-        player.animations['jumping'].update();
         if (player.groundY - player.y >= maxHeight)
         {
             player.y = player.groundY - maxHeight;
@@ -165,7 +166,7 @@ const fallingState = (_player) => {
     function enter()
     {
         player.yVelocity = 0;
-        player.animations['falling'].reset();
+        player.setAnimationId('falling');
     }
 
     function update()
@@ -180,7 +181,6 @@ const fallingState = (_player) => {
             player.states[player.state].enter();
 
         }
-        player.animations['falling'].update();
     }
 
     function onKeyUp(input)
@@ -213,13 +213,12 @@ const landingState = (_player) => {
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.animations['landing'].reset();
+        player.setAnimationId('landing');
     }
 
     function update()
     {
-        const finished = player.animations['landing'].update();
-        if (finished)
+        if (player.animations[player.animation_id].finished())
         {
             player.state = 'idle';
             player.states[player.state].enter();
@@ -252,12 +251,12 @@ const duckingState = (_player) => {
         player.xVelocity = 0;
         player.yVelocity = 0;
         standing = false;
-        player.animations['ducking'].reset();
+        player.setAnimationId('ducking');
     }
 
     function update()
     {
-        const finished = player.animations['ducking'].update();
+        const finished = player.animations[player.animation_id].finished();
         if (standing && finished)
         {
             player.state = 'idle';
@@ -269,7 +268,7 @@ const duckingState = (_player) => {
     {
         if (input !== 'ArrowDown')
             return;
-        player.animations['ducking'].reverse();
+        player.animations[player.animation_id].reverse();
         standing = true;
     }
 
@@ -287,4 +286,211 @@ const duckingState = (_player) => {
     };
 }
 
-export { idleState, runningState, jumpingState, fallingState, landingState, duckingState};
+const shieldOutState = (_player) => {
+    const player = _player;
+    
+    function enter()
+    {
+        player.isShielded = true;
+        player.yVelocity = 0;
+        player.setAnimationId('shieldOut');
+    }
+    
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'shieldWalk';
+            player.states[player.state].enter();
+        }
+    }
+
+    function onKeyUp(input)
+    {
+        if (input === 'ArrowRight' || input === 'ArrowLeft')
+            player.xVelocity = 0;
+        if (input === 'KeyG')
+        {
+            player.state = 'shieldIn';
+            player.states[player.state].enter();
+        }
+    }
+    
+    function onKeyDown(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+        player.state = 'shieldWalk';
+        player.states[player.state].enter();
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const shieldWalkState = (_player) => {
+    const player = _player;
+    const speedModifier = 0.5;
+
+    function enter()
+    {
+        player.xVelocity = player.xVelocity * speedModifier;
+        player.yVelocity = 0;
+        player.setAnimationId('shieldWalk');
+    }
+    
+    function update()
+    {
+        player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
+    }
+    
+    function onKeyUp(input)
+    {
+        if (input === 'ArrowRight' || input === 'ArrowLeft')
+            player.xVelocity = 0;
+        if (input === 'KeyG')
+        {
+            player.state = 'shieldIn';
+            player.states[player.state].enter();
+        }
+    }
+    
+    function onKeyDown(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+        player.xVelocity = player.speed / 2;
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const shieldInState = (_player) => {
+    const player = _player;
+
+    function enter()
+    {
+        player.yVelocity = 0;
+        player.isShielded = false;
+        player.setAnimationId('shieldIn');
+    }
+
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = player.xVelocity === 0 ? 'idle' : 'running';
+            player.states[player.state].enter();
+        }
+    }
+
+    function onKeyUp(input){
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.xVelocity = 0;
+    }
+
+    function onKeyDown(input){
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+    }
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const dieState = (_player) => {
+    const player = _player;
+
+    function enter()
+    {
+        player.xVelocity = 0;
+        player.yVelocity = 0;
+        player.setAnimationId('die');
+    }
+    
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+            player.isDead = true;
+    }
+    
+    function onKeyUp(input){}
+    function onKeyDown(input){}
+    
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}      
+
+const hurtState = (_player) => {
+    const player = _player;
+    
+    function enter()
+    {
+        // we can be hurt mid air
+        player.xVelocity = 0;
+        player.yVelocity = 0;
+        player.setAnimationId(player.hardHit ? 'hardHit' : 'hurt');
+    }
+
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'idle';
+            player.states[player.state].enter();
+            player.hardHit = false;
+        }
+    }
+
+    //just play the hurt animation until it finishes, ignore other inputs
+    function onKeyUp(input)
+    {}
+
+    function onKeyDown(input)
+    {}
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+
+export { idleState,
+         runningState,
+         jumpingState,
+         fallingState,
+         landingState,
+         duckingState,
+         shieldOutState,
+         shieldInState,
+         shieldWalkState,
+         hurtState,
+         dieState,
+        };

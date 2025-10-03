@@ -23,9 +23,10 @@ let loadAnimations = () => {
     animations['landing'] = animation('land', 64, 64, 5, false);
     animations['ducking'] = animation('duck', 64, 64, 3, false);
     animations['hurt'] = animation('hurt', 64, 64, 4);
-    animations['shield_out'] = animation('shield_out', 64, 64, 7);
-    animations['shield_in'] = animation('shield_in', 64, 64, 7);
-    animations['shield_walk'] = animation('shield_walk', 64, 64, 6);
+    animations['hardHit'] = animation('hard_hit', 64, 64, 13);
+    animations['shieldOut'] = animation('shield_out', 64, 64, 7, false);
+    animations['shieldIn'] = animation('shield_in', 64, 64, 7, false);
+    animations['shieldWalk'] = animation('shield_walk', 64, 64, 6);
     return animations;
 };
 
@@ -38,8 +39,15 @@ function loadStates(player)
     states['falling'] = playerState.fallingState(player);
     states['landing'] = playerState.landingState(player);
     states['ducking'] = playerState.duckingState(player);
+    states['shieldOut'] = playerState.shieldOutState(player);
+    states['shieldIn'] = playerState.shieldInState(player);
+    states['shieldWalk'] = playerState.shieldWalkState(player);
+    states['hurt'] = playerState.hurtState(player);
+    states['die'] = playerState.dieState(player);
     return states;
 }
+
+let projectiles = [];
 
 let player = {
     x: width / 2 - 32,
@@ -50,8 +58,19 @@ let player = {
     hitbox_w: 64,
     hitbox_h: 64,
     speed: 8,
+    hardHit: true,
+    hurtTimer: 0,
+    isShielded: false,
     state: 'idle',
     states: {},
+
+    animation_id: 'idle',
+    setAnimationId: function(id) {
+        if (this.animation_id !== id) {
+            this.animation_id = id;
+            this.animations[id].reset();
+        }
+    }
 }
 
 const FPS = 24;
@@ -72,6 +91,7 @@ async function startGame()
     assetsManager.addAsset('land', 'sprites/land_64_5.png');
     assetsManager.addAsset('duck', 'sprites/duck_64_3.png');
     assetsManager.addAsset('hurt', 'sprites/hurt_64_4.png');
+    assetsManager.addAsset('hard_hit', 'sprites/hard_hit_64_13.png');
     assetsManager.addAsset('shield_out', 'sprites/shield_out_64_7.png');
     assetsManager.addAsset('shield_in', 'sprites/shield_in_64_7.png');
     assetsManager.addAsset('shield_walk', 'sprites/shield_walk_64_6.png');
@@ -85,33 +105,93 @@ async function startGame()
 
 function gameLoop(timestamp)
 {
-    let delta = (timestamp - lastTime) / 1000; // convert ms → seconds
+    let delta = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
     accumulator += delta;
 
-    // Run updates as many times as needed to catch up
     while (accumulator >= FIXED_DT) {
-        update(FIXED_DT); // always update with fixed delta
+        update(FIXED_DT);
         accumulator -= FIXED_DT;
     }
-    draw(); // render once per frame
+    draw();
     requestAnimationFrame(gameLoop);
 }
 
 function update(deltaTime)
 {
+    updateProjectiles(deltaTime);
     updatePlayer(deltaTime);
+}
+
+function collides(a, b)
+{
+    return a.x < b.x + 10 && a.x + a.hitbox_w > b.x - 10 &&
+           a.y < b.y + 10 && a.y + a.hitbox_h > b.y - 10;
 }
 
 function updatePlayer(deltaTime)
 {
+    for (let p of projectiles)
+    {
+        if (collides(player, p))
+        {
+            if (player.state != 'hurt' && !player.isShielded)
+            {
+                player.state = 'hurt';
+                player.hurtTimer = 1;
+                player.hardHit = Math.random() < 0.3;
+                player.states[player.state].enter();
+            }
+            p.x = -100; // move projectile out of screen        
+        }
+    }
     player.states[player.state].update();
+    player.animations[player.animation_id].update();
+}
+
+function updateProjectiles(deltaTime)
+{
+    if (Math.random() < 0.02)
+    {
+        let direction = 'right';
+        let speed = 200 + Math.random() * 100;
+        let projectile = {
+            x: direction == 'left' ? -10 : width + 10,
+            y: height - 64 - 32,
+            xVelocity: direction == 'left' ? speed : -speed,
+            yVelocity: 0
+        };
+        projectiles.push(projectile);
+    }
+    
+    for (let projectile of projectiles)
+    {
+        projectile.x += projectile.xVelocity * deltaTime;
+        projectile.y += projectile.yVelocity * deltaTime;
+    }
+    if (projectiles.length > 10)
+        projectiles.splice(0, projectiles.length - 10);
+}
+
+function drawProjectiles()
+{
+    for (let projectile of projectiles)
+    {
+        drawPoint(projectile.x, projectile.y);
+    }
 }
 
 function draw()
 {
     ctx.clearRect(0, 0, width, height);
-    drawPlayer();
+    drawBackground();
+    if (player.hurtTimer > 0) {
+        player.hurtTimer -= 0.1;
+        if (player.hurtTimer < 0) player.hurtTimer = 0;
+    }
+    if (Math.floor(player.hurtTimer * 10) % 2 == 0)
+        drawPlayer();
+    drawProjectiles();
 }
 
 function drawPoint(x, y)
@@ -134,9 +214,8 @@ function drawBackground()
 
 function drawPlayer()
 {
-    drawBackground();
     ctx.save();
-    let frame = player.animations[player.state].getSpriteFrame();
+    let frame = player.animations[player.animation_id].getSpriteFrame();
     ctx.translate(player.x + frame.width / 2, player.y + frame.height / 2);
     if (player.direction == 'left')
         ctx.scale(-1, 1);
@@ -149,9 +228,11 @@ function drawPlayer()
 startGame();
 
 window.addEventListener('keydown', function(e) {
+    // console.log(`pressed ${e.code}`);
     player.states[player.state].onKeyDown(e.code);
 });
 
 window.addEventListener('keyup', function(e) {
+    // console.log(`released ${e.code}`);
     player.states[player.state].onKeyUp(e.code);
 });
