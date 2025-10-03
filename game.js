@@ -27,6 +27,7 @@ let loadAnimations = () => {
     animations['shieldOut'] = animation('shield_out', 64, 64, 7, false);
     animations['shieldIn'] = animation('shield_in', 64, 64, 7, false);
     animations['shieldWalk'] = animation('shield_walk', 64, 64, 6);
+    animations['die'] = animation('die', 64, 64, 18, false, 0, 4);
     return animations;
 };
 
@@ -50,20 +51,25 @@ function loadStates(player)
 let projectiles = [];
 
 let player = {
+    hp: 1,
     x: width / 2 - 32,
     y: height - 63 - 64,
     xVelocity: 0,
     yVelocity: 0,
     direction: 'right',
-    hitbox_w: 64,
-    hitbox_h: 64,
     speed: 8,
+    
     hardHit: true,
     hurtTimer: 0,
     isShielded: false,
+    isDead: false,
+    
     state: 'idle',
     states: {},
-
+    
+    hitbox_w: 64,
+    hitbox_h: 64, // depending on the current frame of animation
+    animations: {},
     animation_id: 'idle',
     setAnimationId: function(id) {
         if (this.animation_id !== id) {
@@ -95,6 +101,7 @@ async function startGame()
     assetsManager.addAsset('shield_out', 'sprites/shield_out_64_7.png');
     assetsManager.addAsset('shield_in', 'sprites/shield_in_64_7.png');
     assetsManager.addAsset('shield_walk', 'sprites/shield_walk_64_6.png');
+    assetsManager.addAsset('die', 'sprites/die_64_18.png');
     await assetsManager.loadAssets();
 
     player.groundY = player.y;
@@ -109,12 +116,28 @@ function gameLoop(timestamp)
     lastTime = timestamp;
     accumulator += delta;
 
+    if (player.isDead)
+    {
+        endGame();
+        return;
+    }
+
     while (accumulator >= FIXED_DT) {
         update(FIXED_DT);
         accumulator -= FIXED_DT;
     }
     draw();
     requestAnimationFrame(gameLoop);
+}
+
+function endGame()
+{
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'white';
+    ctx.font = '48px serif';
+    ctx.fillText('Game Over', width / 2 - 150, height / 2);
+    //blur effect
 }
 
 function update(deltaTime)
@@ -129,7 +152,7 @@ function collides(a, b)
            a.y < b.y + 10 && a.y + a.hitbox_h > b.y - 10;
 }
 
-function updatePlayer(deltaTime)
+function checkCollisions()
 {
     for (let p of projectiles)
     {
@@ -139,11 +162,24 @@ function updatePlayer(deltaTime)
             {
                 player.state = 'hurt';
                 player.hurtTimer = 1;
+                player.hp -= 1;
                 player.hardHit = Math.random() < 0.3;
                 player.states[player.state].enter();
             }
             p.x = -100; // move projectile out of screen        
         }
+    }
+}
+
+function updatePlayer(deltaTime)
+{
+    if (player.state !== 'die')
+        checkCollisions();
+
+    if (player.hp <= 0 && player.state != 'die')
+    {
+        player.state = 'die';
+        player.states[player.state].enter();
     }
     player.states[player.state].update();
     player.animations[player.animation_id].update();
@@ -185,12 +221,8 @@ function draw()
 {
     ctx.clearRect(0, 0, width, height);
     drawBackground();
-    if (player.hurtTimer > 0) {
-        player.hurtTimer -= 0.1;
-        if (player.hurtTimer < 0) player.hurtTimer = 0;
-    }
-    if (Math.floor(player.hurtTimer * 10) % 2 == 0)
-        drawPlayer();
+    drawHpBar();
+    drawPlayer();
     drawProjectiles();
 }
 
@@ -212,8 +244,29 @@ function drawBackground()
     ctx.fillRect(0, height - 64, width, height - 64);
 }
 
+function drawHpBar()
+{
+    const barWidth = 200;
+    const barHeight = 20;
+    const x = 20;
+    const y = 20;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - 2, y - 2, barWidth + 4, barHeight + 4);
+    ctx.fillStyle = 'red';
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(x, y, (player.hp / 5) * barWidth, barHeight);
+}
+
 function drawPlayer()
 {
+    if (player.hurtTimer > 0) {
+        player.hurtTimer -= 0.1;
+        if (player.hurtTimer < 0) 
+            player.hurtTimer = 0;
+        if (Math.floor(player.hurtTimer * 10) % 2 == 0)
+            return;
+    }
     ctx.save();
     let frame = player.animations[player.animation_id].getSpriteFrame();
     ctx.translate(player.x + frame.width / 2, player.y + frame.height / 2);

@@ -30,15 +30,15 @@ function assetManager()
     };
 }
 
-function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true)
+function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true, _offsetX = 0, _offsetY = 0)
 {
     let sprite_name = _sprite_name;
     let frameCount = _frameCount;
     let frameW = _frameW;
     let frameH = _frameH;
 
-    let offsetX = 0;
-    let offsetY = 0;
+    let offsetX = _offsetX;
+    let offsetY = _offsetY;
 
     let repeated = _repeated;
     let reversed = false;
