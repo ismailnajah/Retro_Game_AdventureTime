@@ -1,35 +1,3 @@
-function assetManager()
-{
-    let assets = {};
-    let assetPromises = [];
-
-    let addAsset = async function(name, src) {
-        let img = new Image();
-        let promise = new Promise((resolve, reject) => {
-            img.onload = () => {
-                assets[name] = img;
-                resolve();
-            };
-            img.onerror = reject;
-        });
-        img.src = src;
-        assetPromises.push(promise);
-    }
-
-    let loadAssets = async function() {    
-        await Promise.all(assetPromises);
-    }
-
-    let getAsset = function(name) {
-        return assets[name];
-    }
-    return {
-        loadAssets: loadAssets,
-        addAsset: addAsset,
-        getAsset: getAsset
-    };
-}
-
 function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true, _offsetX = 0, _offsetY = 0)
 {
     let sprite_name = _sprite_name;
@@ -100,4 +68,4 @@ function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true
     };
 }
 
-export { animation, assetManager };
+export { animation };
