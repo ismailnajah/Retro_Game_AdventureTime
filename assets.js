@@ -48,6 +48,16 @@ let assetsManager = () => {
     manager.add('shield_in', 'sprites/shield_in_64_7.png');
     manager.add('shield_walk', 'sprites/shield_walk_64_6.png');
     manager.add('die', 'sprites/die_64_18.png');
+    manager.add('jake_roll_in', 'sprites/jake_roll_in_72_7.png');
+    manager.add('jake_roll', 'sprites/jake_roll_72_9.png');
+    manager.add('jake_roll_out', 'sprites/jake_roll_out_72_19.png');
+
+    // Background assets
+    manager.add('sky', 'background/sky.png');
+    manager.add('mountains', 'background/mountains.png');
+    manager.add('trees', 'background/trees.png');
+    manager.add('grass', 'background/grass.png');
+    manager.add('ground', 'background/ground.png');
     return manager;
 };
 

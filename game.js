@@ -1,5 +1,6 @@
 import { assetsManager } from "./assets.js";
 import { Player } from "./player.js";
+import { Background } from "./background.js";
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -11,18 +12,77 @@ const FIXED_DT = 1 / FPS; // fixed timestep in seconds
 let accumulator = 0;
 let lastTime = performance.now();
 
-
 let assets = assetsManager();
 
 let projectiles = [];
 
+const player = new Player(width / 2 - 32, height - 64 - 35);
 
-const player = new Player(width / 2 - 32, height - 63 - 64);
+let gameStarted = false;
+let update = startScreenUpdate;
+let draw = startScreenDraw;
+let background;
 
 async function startGame()
 {
     await assets.load();
-    requestAnimationFrame(gameLoop);    
+    background = new Background(width, height, assets);
+    player.setState('walking');
+
+    window.addEventListener('keydown', function onStart(e) {
+        gameStarted = true;
+        window.removeEventListener('keydown', onStart);
+        player.setState('jakeRollIn');
+        update = transitionUpdate;
+        draw = transitionDraw;
+    });
+    requestAnimationFrame(gameLoop);
+    console.log(width, height);
+}
+
+function startScreenUpdate()
+{
+    player.update();
+}
+
+function startScreenDraw()
+{
+    drawBackground(true);
+    player.draw(ctx, assets);
+    ctx.fillStyle = 'black';
+    ctx.font = '48px serif';
+    ctx.fillText('Press any key to start', width / 2 - 250, height / 2);
+}
+
+let shouldStop = false;
+function transitionUpdate()
+{
+    if (player.x > width)
+    {
+        player.x = -player.hitbox_w;
+        shouldStop = true;
+    }
+    if (shouldStop && player.x >= width * 0.2)
+        player.setState('jakeRollOut');
+
+    player.update();
+    if (player.state === 'idle')
+    {
+        window.addEventListener('keydown', function(e) {
+            player.states[player.state].onKeyDown(e.code);
+        });
+        window.addEventListener('keyup', function(e) {
+            player.states[player.state].onKeyUp(e.code);
+        });
+        update = gameUpdate;
+        draw = gameDraw;
+    }
+}
+
+function transitionDraw()
+{
+    drawBackground();
+    player.draw(ctx, assets);
 }
 
 function gameLoop(timestamp)
@@ -36,7 +96,6 @@ function gameLoop(timestamp)
         endGame();
         return;
     }
-
     while (accumulator >= FIXED_DT) {
         update(FIXED_DT);
         accumulator -= FIXED_DT;
@@ -54,7 +113,7 @@ function endGame()
     ctx.fillText('Game Over', width / 2 - 150, height / 2);
 }
 
-function update(deltaTime)
+function gameUpdate(deltaTime)
 {
     updateProjectiles(deltaTime);
     checkCollisions();
@@ -63,6 +122,8 @@ function update(deltaTime)
 
 function checkCollisions()
 {
+    if (player.state == 'die')
+        return;
     for (let p of projectiles)
     {
         if (player.collidesWith(p))
@@ -75,7 +136,7 @@ function checkCollisions()
                 player.hardHit = Math.random() < 0.3;
                 player.states[player.state].enter();
             }
-            p.x = -100; // move projectile out of screen        
+            p.x = -100;   
         }
     }
 }
@@ -88,7 +149,7 @@ function updateProjectiles(deltaTime)
         let speed = 200 + Math.random() * 100;
         let projectile = {
             x: direction == 'left' ? -10 : width + 10,
-            y: height - 64 - 32,
+            y: height - 64,
             xVelocity: direction == 'left' ? speed : -speed,
             yVelocity: 0
         };
@@ -112,7 +173,7 @@ function drawProjectiles()
     }
 }
 
-function draw()
+function gameDraw()
 {
     ctx.clearRect(0, 0, width, height);
     drawBackground();
@@ -130,18 +191,22 @@ function drawPoint(x, y)
     ctx.closePath();
 }
 
-function drawBackground()
+function drawBackground(moveBackground = false)
 {
-    //draw ground
-    ctx.fillStyle = 'lightblue';
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0, height - 64, width, height - 64);
+    ctx.clearRect(0, 0, width, height);
+    if (moveBackground)
+        background.update();
+    background.draw(ctx, assets);
+    // //draw ground
+    // ctx.fillStyle = 'lightblue';
+    // ctx.fillRect(0, 0, width, height);
+    // ctx.fillStyle = 'green';
+    // ctx.fillRect(0, height - 64, width, height - 64);
 }
 
 function drawHpBar()
 {
-    const barWidth = 200;
+    const barWidth = 300;
     const barHeight = 20;
     const x = 20;
     const y = 20;
@@ -150,17 +215,17 @@ function drawHpBar()
     ctx.fillStyle = 'red';
     ctx.fillRect(x, y, barWidth, barHeight);
     ctx.fillStyle = 'green';
-    ctx.fillRect(x, y, (player.hp / 5) * barWidth, barHeight);
+    ctx.fillRect(x, y, (player.hp / player.maxHp) * barWidth, barHeight);
+
+    for (let i = 0; i <= player.maxHp; i++)
+    {
+        ctx.strokeStyle = 'black';
+        ctx.beginPath();
+        ctx.moveTo(x + (i * barWidth / player.maxHp), y);
+        ctx.lineTo(x + (i * barWidth / player.maxHp), y + barHeight);
+        ctx.stroke();
+        ctx.closePath();
+    }
 }
 
 startGame();
-
-window.addEventListener('keydown', function(e) {
-    // console.log(`pressed ${e.code}`);
-    player.states[player.state].onKeyDown(e.code);
-});
-
-window.addEventListener('keyup', function(e) {
-    // console.log(`released ${e.code}`);
-    player.states[player.state].onKeyUp(e.code);
-});

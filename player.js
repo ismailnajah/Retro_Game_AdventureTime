@@ -5,7 +5,8 @@ class Player
 {
     constructor(x, y)
     {
-        this.hp =  5;
+        this.maxHp = 10;
+        this.hp = 10;
         this.x = x;
         this.y = y;
         this.groundY = y;
@@ -34,6 +35,15 @@ class Player
         {
             this.animation_id = id;
             this.animations[id].reset();
+        }
+    }
+
+    setState(state)
+    {
+        if (this.state !== state)
+        {
+            this.state = state;
+            this.states[state].enter();
         }
     }
 
@@ -68,6 +78,8 @@ class Player
         }
         this.states[this.state].update();
         this.animations[this.animation_id].update();
+        if (this.x < 0)
+            this.x = 0;
     }
 
     collidesWith(other)
@@ -81,6 +93,10 @@ function setStates(player)
 {
     const states = {};
     states['idle']    = playerState.idleState(player);
+    states['walking'] = playerState.walkingState(player);
+    states['jakeRollIn'] = playerState.jakeRollInState(player);
+    states['jakeRoll'] = playerState.jakeRollState(player);
+    states['jakeRollOut'] = playerState.jakeRollOutState(player);
     states['running'] = playerState.runningState(player);
     states['jumping'] = playerState.jumpingState(player);
     states['falling'] = playerState.fallingState(player);
@@ -101,7 +117,7 @@ function setAnimations()
     anim['idle2'] = animation('idle2', 64, 64, 12);
     anim['idle3'] = animation('idle3', 64, 64, 12);
     anim['idle4'] = animation('idle4', 64, 64, 21);
-    anim['walk'] = animation('walk', 64, 64, 17);
+    anim['walking'] = animation('walk', 64, 64, 17);
     anim['running'] = animation('run', 64, 64, 12);
     anim['jumping'] = animation('jump', 64, 64, 5, false);
     anim['falling'] = animation('fall', 64, 64, 5, false);
@@ -113,6 +129,9 @@ function setAnimations()
     anim['shieldIn'] = animation('shield_in', 64, 64, 7, false);
     anim['shieldWalk'] = animation('shield_walk', 64, 64, 6);
     anim['die'] = animation('die', 64, 64, 18, false, 0, 4);
+    anim['jakeRollIn'] = animation('jake_roll_in', 72, 72, 7, false, 0, -8);
+    anim['jakeRoll'] = animation('jake_roll', 72, 72, 9, true, 0, -8);
+    anim['jakeRollOut'] = animation('jake_roll_out', 72, 72, 19, false, -8, -8);
     return anim;
 };
 

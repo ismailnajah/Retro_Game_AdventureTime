@@ -49,6 +49,109 @@ const idleState = (_player) => {
     };
 }
 
+const walkingState = (_player) => {
+    //this state only for start screen animation
+    const player = _player;
+
+    function enter()
+    {
+        player.xVelocity = 0;
+        player.yVelocity = 0;
+        player.setAnimationId('walking');
+    }
+    
+    function update(){}
+    function onKeyUp(input){}
+    function onKeyDown(input){}
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const jakeRollInState = (_player) => {
+    //this state only for the transition animation
+    const player = _player;
+
+    function enter()
+    {
+        player.xVelocity = player.speed * 1.5;
+        player.yVelocity = 0;
+        player.setAnimationId('jakeRollIn');
+    }
+    
+    function update()
+    {
+        player.x += player.xVelocity;
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'jakeRoll';
+            player.states[player.state].enter();
+        }
+    }
+    function onKeyUp(input){}
+    function onKeyDown(input){}
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const jakeRollState = (_player) => {
+    //this state only for the transition animation
+    const player = _player;
+
+    function enter()
+    {
+        player.setAnimationId('jakeRoll');
+    }
+    function update(){
+        player.x += player.xVelocity;
+    }
+    function onKeyUp(input){}
+    function onKeyDown(input){}
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const jakeRollOutState = (_player) => {
+    //this state only for the transition animation
+    const player = _player;
+
+    function enter()
+    {
+        player.xVelocity = 0;
+        player.setAnimationId('jakeRollOut');
+    }
+    
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'idle';
+            player.states[player.state].enter();
+        }
+    }
+    function onKeyUp(input){}
+    function onKeyDown(input){}
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
 const runningState = (_player) => {
     const player = _player;
 
@@ -483,6 +586,10 @@ const hurtState = (_player) => {
 
 
 export { idleState,
+         walkingState,
+         jakeRollInState,
+         jakeRollState,
+         jakeRollOutState,
          runningState,
          jumpingState,
          fallingState,
