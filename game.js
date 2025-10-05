@@ -60,7 +60,7 @@ function transitionUpdate()
 {
     if (player.x > width)
     {
-        player.x = -player.hitbox_w;
+        player.x = -100;
         shouldStop = true;
     }
     if (shouldStop && player.x >= width * 0.2)
@@ -123,18 +123,25 @@ function endGame()
 
 function gameUpdate(deltaTime)
 {
-    //updateProjectiles(deltaTime);
+    updateProjectiles(deltaTime);
     checkCollisions();
     player.update(deltaTime);
+}
+
+function collidesWith(a, b)
+{
+    return a.x < b.x + 10 && a.x + a.width > b.x - 10 &&
+           a.y < b.y + 10 && a.y + a.height > b.y - 10;
 }
 
 function checkCollisions()
 {
     if (player.state == 'die')
         return;
+    const player_hitbox = player.getHitbox();
     for (let p of projectiles)
     {
-        if (player.collidesWith(p))
+        if (collidesWith(player_hitbox, p))
         {
             if (player.state != 'hurt' && !player.isShielded)
             {
@@ -153,12 +160,11 @@ function updateProjectiles(deltaTime)
 {
     if (Math.random() < 0.02)
     {
-        let direction = 'right';
         let speed = 200 + Math.random() * 100;
         let projectile = {
-            x: direction == 'left' ? -10 : width + 10,
-            y: height - 64,
-            xVelocity: direction == 'left' ? speed : -speed,
+            x: width + 10,
+            y: height - 80 + Math.random() * 30,
+            xVelocity: -speed,
             yVelocity: 0
         };
         projectiles.push(projectile);
@@ -205,11 +211,6 @@ function drawBackground(moveBackground = false)
     if (moveBackground)
         background.update();
     background.draw(ctx, assets);
-    // //draw ground
-    // ctx.fillStyle = 'lightblue';
-    // ctx.fillRect(0, 0, width, height);
-    // ctx.fillStyle = 'green';
-    // ctx.fillRect(0, height - 64, width, height - 64);
 }
 
 function drawHpBar()

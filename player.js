@@ -1,5 +1,6 @@
 import * as playerState from "./playerState.js";
 import { animation } from "./animation.js";
+import { playerAssetsData } from "./playerAssetsData.js";
 
 class Player
 {
@@ -24,9 +25,7 @@ class Player
         this.state = 'idle';
         this.states = setStates(this);
 
-        this.hitbox_w = 64;
-        this.hitbox_h = 64; // depending on the current frame of animation
-        this.animation_id = 'idle';
+        this.animation_id = 'idle1';
         this.animations = setAnimations();
     }
     
@@ -58,10 +57,11 @@ class Player
                 return;
         }
         ctx.save();
-        let frame = this.animations[this.animation_id].getSpriteFrame();
+        let frame = this.animations[this.animation_id];
         ctx.translate(this.x, this.y);
         if (this.direction == 'left')
             ctx.scale(-1, 1);
+        // ctx.drawImage(assets.get(frame.sprite_name), this.x, this.y);
         ctx.drawImage(assets.get(frame.sprite_name),
                 frame.x, frame.y, frame.width, frame.height, 
                 -frame.width / 2 + frame.offsetX,
@@ -69,10 +69,8 @@ class Player
                 frame.width, frame.height);
         ctx.restore();
         ctx.strokeStyle = 'red';
-        ctx.strokeRect(
-            this.x - frame.hitbox_w / 2,
-            this.y - frame.hitbox_h / 2,
-            frame.hitbox_w, frame.height);
+        const hitbox = this.getHitbox();
+        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
     }
 
     update (deltatime)
@@ -88,10 +86,20 @@ class Player
             this.x = 0;
     }
 
-    collidesWith(other)
+    getHitbox()
     {
-        return this.x < other.x + 10 && this.x + this.hitbox_w > other.x - 10 &&
-               this.y < other.y + 10 && this.y + this.hitbox_h > other.y - 10;
+        const frame = this.animations[this.animation_id];
+        const currentFrame = frame.currentFrame
+        const hitbox = frame.hitboxes[currentFrame];
+        let hitbox_x = hitbox.x + frame.offsetX;
+        if (this.direction === 'left')
+            hitbox_x = frame.width - hitbox.x - hitbox.width - frame.offsetX;
+        return {
+            x: this.x + hitbox_x - frame.width / 2,
+            y: this.y + hitbox.y - frame.height / 2 + frame.offsetY,
+            width: hitbox.width,
+            height: hitbox.height
+        };
     }
 }
 
@@ -122,32 +130,37 @@ function setStates(player)
 function setAnimations()
 {
     let anim = {};
-    anim['idle'] = animation('idle1', 64, 64, 12);
-    anim['idle2'] = animation('idle2', 64, 64, 12);
-    anim['idle3'] = animation('idle3', 64, 64, 12);
-    anim['idle4'] = animation('idle4', 64, 64, 21);
-    anim['walking'] = animation('walk', 64, 64, 17);
-    anim['running'] = animation('run', 64, 64, 12);
-    anim['jumping'] = animation('jump', 64, 64, 5, false);
-    anim['falling'] = animation('fall', 64, 64, 5, false);
-    anim['landing'] = animation('land', 64, 64, 5, false);
-    anim['ducking'] = animation('duck', 64, 64, 3, false);
-    
-    anim['hurt'] = animation('hurt', 64, 64, 4);
-    anim['hardHit'] = animation('hard_hit', 64, 64, 13);
-    anim['die'] = animation('die', 64, 64, 18, false, 0, 4);
-    
-    anim['shieldOut'] = animation('shield_out', 64, 64, 7, false);
-    anim['shieldIn'] = animation('shield_in', 64, 64, 7, false);
-    anim['shieldWalk'] = animation('shield_walk', 64, 64, 6);
-    
-    anim['swordOut'] = animation('sword_out', 92, 92, 3, false, 14, -14);
-    anim['swordAttack'] = animation('sword_attack', 92, 92, 6, false, 14, -14);
-    anim['swordCombo'] = animation('sword_combo', 92, 92, 12, false, 14, -14);
+    for (let key in playerAssetsData)
+    {
+        let data = playerAssetsData[key];
+        anim[key] = new animation(key, data.frame_w, data.frame_h, data.frames, data.hitboxes);
+    }
 
-    anim['jakeRollIn'] = animation('jake_roll_in', 72, 72, 7, false, 0, -8);
-    anim['jakeRoll'] = animation('jake_roll', 72, 72, 9, true, 0, -8);
-    anim['jakeRollOut'] = animation('jake_roll_out', 72, 72, 19, true, -4, -4);
+    //manualy tweak some animations
+    anim['jump'].repeated = false;
+    anim['fall'].repeated = false;
+    anim['land'].repeated = false;
+    anim['duck'].repeated = false;
+    anim['hurt'].repeated = false;
+    anim['die'].repeated = false;
+    anim['sword_out'].repeated = false;
+    anim['sword_attack'].repeated = false;
+    anim['sword_combo'].repeated = false;
+    anim['jake_roll_in'].repeated = false;
+    anim['jake_roll_out'].repeated = false;
+
+    anim['sword_out'].offsetX = 14;
+    anim['sword_out'].offsetY = -14;
+    anim['sword_attack'].offsetX = 14;
+    anim['sword_attack'].offsetY = -14;
+    anim['sword_combo'].offsetX = 14;
+    anim['sword_combo'].offsetY = -14;
+    
+    anim['jake_roll_in'].offsetY = -8;
+    anim['jake_roll'].offsetY = -8;
+    anim['jake_roll_out'].offsetX = -4;
+    anim['jake_roll_out'].offsetY = -4;
+    
     return anim;
 };
 

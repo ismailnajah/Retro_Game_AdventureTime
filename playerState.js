@@ -4,7 +4,7 @@ const idleState = (_player) => {
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.setAnimationId('idle');
+        player.setAnimationId('idle1');
     }
 
     function update()
@@ -60,7 +60,7 @@ const walkingState = (_player) => {
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.setAnimationId('walking');
+        player.setAnimationId('walk');
     }
     
     function update(){}
@@ -82,7 +82,7 @@ const jakeRollInState = (_player) => {
     {
         player.xVelocity = player.speed * 1.5;
         player.yVelocity = 0;
-        player.setAnimationId('jakeRollIn');
+        player.setAnimationId('jake_roll_in');
     }
     
     function update()
@@ -111,7 +111,7 @@ const jakeRollState = (_player) => {
 
     function enter()
     {
-        player.setAnimationId('jakeRoll');
+        player.setAnimationId('jake_roll');
     }
     function update(){
         player.x += player.xVelocity;
@@ -133,7 +133,7 @@ const jakeRollOutState = (_player) => {
     function enter()
     {
         player.xVelocity = 0;
-        player.setAnimationId('jakeRollOut');
+        player.setAnimationId('jake_roll_out');
     }
     
     function update()
@@ -162,7 +162,7 @@ const runningState = (_player) => {
     {
         player.xVelocity = player.speed;
         player.yVelocity = 0;
-        player.setAnimationId('running');
+        player.setAnimationId('run');
     }
 
     function update()
@@ -228,7 +228,7 @@ const jumpingState = (_player) => {
     function enter()
     {
         player.yVelocity = -jumpStrength;
-        player.setAnimationId('jumping');
+        player.setAnimationId('jump');
         maxHeight = 150;
     }
 
@@ -275,7 +275,7 @@ const fallingState = (_player) => {
     function enter()
     {
         player.yVelocity = 0;
-        player.setAnimationId('falling');
+        player.setAnimationId('fall');
     }
 
     function update()
@@ -322,7 +322,7 @@ const landingState = (_player) => {
     {
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.setAnimationId('landing');
+        player.setAnimationId('land');
     }
 
     function update()
@@ -360,7 +360,7 @@ const duckingState = (_player) => {
         player.xVelocity = 0;
         player.yVelocity = 0;
         standing = false;
-        player.setAnimationId('ducking');
+        player.setAnimationId('duck');
     }
 
     function update()
@@ -402,7 +402,7 @@ const shieldOutState = (_player) => {
     {
         player.isShielded = true;
         player.yVelocity = 0;
-        player.setAnimationId('shieldOut');
+        player.setAnimationId('shield_out');
     }
     
     function update()
@@ -451,7 +451,7 @@ const shieldWalkState = (_player) => {
     {
         player.xVelocity = player.xVelocity * speedModifier;
         player.yVelocity = 0;
-        player.setAnimationId('shieldWalk');
+        player.setAnimationId('shield_walk');
     }
     
     function update()
@@ -493,7 +493,7 @@ const shieldInState = (_player) => {
     {
         player.yVelocity = 0;
         player.isShielded = false;
-        player.setAnimationId('shieldIn');
+        player.setAnimationId('shield_in');
     }
 
     function update()
@@ -561,7 +561,7 @@ const hurtState = (_player) => {
         // we can be hurt mid air
         player.xVelocity = 0;
         player.yVelocity = 0;
-        player.setAnimationId(player.hardHit ? 'hardHit' : 'hurt');
+        player.setAnimationId(player.hardHit ? 'hard_hit' : 'hurt');
     }
 
     function update()
@@ -595,7 +595,7 @@ const swordOutState = (_player) => {
 
     function enter()
     {
-        player.setAnimationId('swordOut');
+        player.setAnimationId('sword_out');
         player.shouldCombo = true;
     }
 
@@ -633,7 +633,7 @@ const swordAttackState = (_player) => {
 
     function enter()
     {
-        player.setAnimationId('swordAttack');
+        player.setAnimationId('sword_attack');
     }
 
     function update()
@@ -643,7 +643,7 @@ const swordAttackState = (_player) => {
         {
             if (player.shouldCombo)
             {
-                player.setAnimationId('swordCombo');
+                player.setAnimationId('sword_combo');
                 player.x += player.direction === 'right' ? step : -step;
                 player.shouldCombo = false;
             }
@@ -681,7 +681,7 @@ const swordInState = (_player) => {
 
     function enter()
     {
-        player.setAnimationId('swordOut');
+        player.setAnimationId('sword_out');
         player.animations[player.animation_id].reverse();
     }
     
