@@ -3,7 +3,11 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 
 const canvas = document.getElementById('gameCanvas');
+const rect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext('2d');
+
+canvas.width = rect.width;
+canvas.height = rect.height;
 const width = canvas.width;
 const height = canvas.height;
 
@@ -16,7 +20,8 @@ let assets = assetsManager();
 
 let projectiles = [];
 
-const player = new Player(width / 2, height - 64);
+console.log(canvas.width, canvas.height);
+const player = new Player(width / 2, height - 60);
 
 let gameStarted = false;
 let update = startScreenUpdate;
@@ -30,6 +35,7 @@ async function startGame()
     await assets.load();
     background = new Background(width, height, assets);
     player.setState('walking');
+    player.maxHeight = height * 0.3;
 
     window.addEventListener('keydown', function onStart(e) {
         gameStarted = true;
@@ -51,8 +57,9 @@ function startScreenDraw()
     drawBackground(true);
     player.draw(ctx, assets);
     ctx.fillStyle = 'black';
-    ctx.font = '48px serif';
-    ctx.fillText('Press any key to start', width / 2 - 250, height / 2);
+    ctx.font = `${width * 0.06}px serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Press any key to start', width / 2, height * 0.2);
 }
 
 let shouldStop = false;
@@ -60,7 +67,7 @@ function transitionUpdate()
 {
     if (player.x > width)
     {
-        player.x = -100;
+        player.x = -10;
         shouldStop = true;
     }
     if (shouldStop && player.x >= width * 0.2)
@@ -118,7 +125,7 @@ function endGame()
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = 'white';
     ctx.font = '48px serif';
-    ctx.fillText('Game Over', width / 2 - 150, height / 2);
+    ctx.fillText('Game Over', width / 2, height / 2);
 }
 
 function gameUpdate(deltaTime)
@@ -221,7 +228,7 @@ function drawHpBar()
     const bar = assets.get('hp_bar');
     const w = bar.width;
     ctx.save();
-    ctx.scale(0.8, 0.8);
+    ctx.scale(0.5, 0.5);
     const h = bar.height / 9; // include empty part
     let hp = 8 - player.hp;
 

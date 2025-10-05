@@ -4,35 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Integration Week Game</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        canvas {
-            border: 1px solid black;
-            background-color: #f0f0f0;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    <link rel="stylesheet" href="style.css">
     </style>
 </head>
 <body> 
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div>
-        <p>Controls:</p>
-        <ul>
-            <li>➡️ : Move Right</li>
-            <li>⬅️ : Move Left</li>
-            <li>⬆️ : Jump</li>
-            <li>⬇️ : Crouch</li>
-            <li>🇬: Toggle Shield</li>
-        </ul>
+    <div id="bmoBody">
+        <div id="bmoScreen">
+            <canvas id="gameCanvas"></canvas>
+            <script src="game.js" type="module"></script>
+        </div>
     </div>
-    <script src="game.js" type="module"></script>
+    <!-- <canvas id="gameCanvas" width="800" height="600"></canvas> -->
 </body>
 </html>

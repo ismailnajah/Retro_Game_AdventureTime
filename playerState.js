@@ -220,16 +220,11 @@ const runningState = (_player) => {
 
 const jumpingState = (_player) => {
     const player = _player;
-    let maxHeight = 150;
-    const jumpStrength = 20;
-
-
-    //TODO: splite jumping into tree states: rising, falling, landing
+    
     function enter()
     {
-        player.yVelocity = -jumpStrength;
+        player.yVelocity = -player.jumpStrength;
         player.setAnimationId('jump');
-        maxHeight = 150;
     }
 
     function update()
@@ -237,9 +232,9 @@ const jumpingState = (_player) => {
         player.x += player.direction === 'right' ? player.xVelocity : -player.xVelocity;
         player.y += player.yVelocity;
         
-        if (player.groundY - player.y >= maxHeight)
+        if (player.groundY - player.y >= player.maxHeight)
         {
-            player.y = player.groundY - maxHeight;
+            player.y = player.groundY - player.maxHeight;
             player.state = 'falling';
             player.states[player.state].enter();
         }

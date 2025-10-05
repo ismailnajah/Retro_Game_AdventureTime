@@ -16,7 +16,7 @@ class Background
             width: assets.get('mountains').width,
             height: assets.get('mountains').height,
             x: 0,
-            y: screenH * 0.25, 
+            y: screenH * 0.1, 
             speed: 0.2,
         };
 
@@ -24,21 +24,21 @@ class Background
             width: assets.get('trees').width,
             height: assets.get('trees').height,
             x: 0,
-            y: screenH * 0.5,
+            y: screenH * 0.4,
             speed: 0.4,
         };
         this.grass = {
             width: assets.get('grass').width,
             height: assets.get('grass').height,
             x: 0, 
-            y: screenH - assets.get('grass').height, 
+            y: screenH - assets.get('grass').height + 5, 
             speed: 0.6
         };
         this.ground = {
             width: assets.get('ground').width,
             height: assets.get('ground').height,
             x: 0,
-            y: screenH - assets.get('ground').height,
+            y: screenH - assets.get('ground').height + 10,
             speed: 1,
         }
     }

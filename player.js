@@ -7,7 +7,7 @@ class Player
     constructor(x, y)
     {
         this.maxHp = 8;
-        this.hp = 8;
+        this.hp = 1;
         this.x = x;
         this.y = y;
         this.groundY = y;
@@ -15,6 +15,8 @@ class Player
         this.yVelocity = 0;
         this.direction = 'right';
         this.speed = 8;
+        this.jumpStrength = 20;
+        this.maxHeight = 150;
         
         this.shouldCombo = false;
         this.hardHit = true;
@@ -68,9 +70,9 @@ class Player
                 -frame.height / 2 + frame.offsetY,
                 frame.width, frame.height);
         ctx.restore();
-        ctx.strokeStyle = 'red';
-        const hitbox = this.getHitbox();
-        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        // ctx.strokeStyle = 'red';
+        // const hitbox = this.getHitbox();
+        // ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
     }
 
     update (deltatime)
