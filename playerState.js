@@ -31,6 +31,9 @@ const idleState = (_player) => {
             case 'KeyG':
                 player.state = 'shieldOut';
                 break;
+            case 'Space':
+                player.state = 'swordOut';
+                break;
             default:
                 break;
         }
@@ -195,6 +198,9 @@ const runningState = (_player) => {
                 break;
             case 'KeyG':
                 player.state = 'shieldOut';
+                break;
+            case 'Space':
+                player.state = 'swordOut';
                 break;
             default:
                 player.state = 'idle';
@@ -584,6 +590,125 @@ const hurtState = (_player) => {
     };
 }
 
+const swordOutState = (_player) => {
+    const player = _player;
+
+    function enter()
+    {
+        player.setAnimationId('swordOut');
+        player.shouldCombo = true;
+    }
+
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'swordAttack';
+            player.states[player.state].enter();
+        }
+    }
+
+    function onKeyUp(input){
+        if (input === 'Space')
+            player.shouldCombo = false;
+    }
+    function onKeyDown(input){
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const swordAttackState = (_player) => {
+    const player = _player;
+    let step = 2;
+
+    function enter()
+    {
+        player.setAnimationId('swordAttack');
+    }
+
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            if (player.shouldCombo)
+            {
+                player.setAnimationId('swordCombo');
+                player.x += player.direction === 'right' ? step : -step;
+                player.shouldCombo = false;
+            }
+            else
+            {
+                player.state = 'swordIn';
+                player.states[player.state].enter();
+            }
+        }
+    }
+
+    function onKeyUp(input)
+    {
+        if (input === 'Space')
+            player.shouldCombo = false;
+    }
+
+    function onKeyDown(input)
+    {
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
+const swordInState = (_player) => {
+    const player = _player;
+
+    function enter()
+    {
+        player.setAnimationId('swordOut');
+        player.animations[player.animation_id].reverse();
+    }
+    
+    function update()
+    {
+        const finished = player.animations[player.animation_id].finished();
+        if (finished)
+        {
+            player.state = 'idle';
+            player.states[player.state].enter();
+        }
+    }
+    function onKeyUp(input){}
+    function onKeyDown(input){
+        if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            return ;
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
+    }
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
 
 export { idleState,
          walkingState,
@@ -598,6 +723,9 @@ export { idleState,
          shieldOutState,
          shieldInState,
          shieldWalkState,
+         swordOutState,
+         swordAttackState,
+         swordInState,
          hurtState,
          dieState,
         };

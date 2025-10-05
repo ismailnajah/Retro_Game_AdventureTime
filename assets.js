@@ -44,6 +44,11 @@ let assetsManager = () => {
     manager.add('duck', 'sprites/duck_64_3.png');
     manager.add('hurt', 'sprites/hurt_64_4.png');
     manager.add('hard_hit', 'sprites/hard_hit_64_13.png');
+
+    // Sword assets
+    manager.add('sword_out', 'sprites/sword_out_92_3.png');
+    manager.add('sword_attack', 'sprites/sword_attack_92_6.png');
+    manager.add('sword_combo', 'sprites/sword_combo_92_12.png');
     manager.add('shield_out', 'sprites/shield_out_64_7.png');
     manager.add('shield_in', 'sprites/shield_in_64_7.png');
     manager.add('shield_walk', 'sprites/shield_walk_64_6.png');

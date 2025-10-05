@@ -16,11 +16,13 @@ let assets = assetsManager();
 
 let projectiles = [];
 
-const player = new Player(width / 2 - 32, height - 64 - 35);
+const player = new Player(width / 2 - 32, height - 64);
 
 let gameStarted = false;
 let update = startScreenUpdate;
 let draw = startScreenDraw;
+// let update = gameUpdate;
+// let draw = gameDraw;
 let background;
 
 async function startGame()
@@ -37,7 +39,6 @@ async function startGame()
         draw = transitionDraw;
     });
     requestAnimationFrame(gameLoop);
-    console.log(width, height);
 }
 
 function startScreenUpdate()
@@ -79,6 +80,13 @@ function transitionUpdate()
     }
 }
 
+// window.addEventListener('keydown', function(e) {
+//     player.states[player.state].onKeyDown(e.code);
+// });
+// window.addEventListener('keyup', function(e) {
+//     player.states[player.state].onKeyUp(e.code);
+// });
+
 function transitionDraw()
 {
     drawBackground();
@@ -115,7 +123,7 @@ function endGame()
 
 function gameUpdate(deltaTime)
 {
-    updateProjectiles(deltaTime);
+    //updateProjectiles(deltaTime);
     checkCollisions();
     player.update(deltaTime);
 }
