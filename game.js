@@ -16,7 +16,7 @@ let assets = assetsManager();
 
 let projectiles = [];
 
-const player = new Player(width / 2 - 32, height - 64);
+const player = new Player(width / 2, height - 64);
 
 let gameStarted = false;
 let update = startScreenUpdate;
@@ -80,12 +80,12 @@ function transitionUpdate()
     }
 }
 
-// window.addEventListener('keydown', function(e) {
-//     player.states[player.state].onKeyDown(e.code);
-// });
-// window.addEventListener('keyup', function(e) {
-//     player.states[player.state].onKeyUp(e.code);
-// });
+window.addEventListener('keydown', function(e) {
+    player.states[player.state].onKeyDown(e.code);
+});
+window.addEventListener('keyup', function(e) {
+    player.states[player.state].onKeyUp(e.code);
+});
 
 function transitionDraw()
 {
@@ -213,28 +213,27 @@ function drawBackground(moveBackground = false)
     background.draw(ctx, assets);
 }
 
+let flickerTimer = 0;
 function drawHpBar()
 {
-    const barWidth = 300;
-    const barHeight = 20;
-    const x = 20;
-    const y = 20;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(x - 2, y - 2, barWidth + 4, barHeight + 4);
-    ctx.fillStyle = 'red';
-    ctx.fillRect(x, y, barWidth, barHeight);
-    ctx.fillStyle = 'green';
-    ctx.fillRect(x, y, (player.hp / player.maxHp) * barWidth, barHeight);
+    if (player.state === 'hurt')
+        flickerTimer = 1;
+    const bar = assets.get('hp_bar');
+    const w = bar.width;
+    ctx.save();
+    ctx.scale(0.8, 0.8);
+    const h = bar.height / 9; // include empty part
+    let hp = 8 - player.hp;
 
-    for (let i = 0; i <= player.maxHp; i++)
+    if (flickerTimer > 0)
     {
-        ctx.strokeStyle = 'black';
-        ctx.beginPath();
-        ctx.moveTo(x + (i * barWidth / player.maxHp), y);
-        ctx.lineTo(x + (i * barWidth / player.maxHp), y + barHeight);
-        ctx.stroke();
-        ctx.closePath();
+        if (Math.floor(flickerTimer * 10) % 2 == 0)
+            hp--;
+        flickerTimer -= 0.05;
     }
+    const y = hp * h;
+    ctx.drawImage(bar, 0, y, w, h, 10, 10, w, h);
+    ctx.restore()
 }
 
 startGame();

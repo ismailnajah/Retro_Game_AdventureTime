@@ -6,8 +6,8 @@ class Player
 {
     constructor(x, y)
     {
-        this.maxHp = 10;
-        this.hp = 10;
+        this.maxHp = 8;
+        this.hp = 8;
         this.x = x;
         this.y = y;
         this.groundY = y;
