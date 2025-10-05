@@ -7,7 +7,7 @@ class Player
     constructor(x, y)
     {
         this.maxHp = 8;
-        this.hp = 1;
+        this.hp = 8;
         this.x = x;
         this.y = y;
         this.groundY = y;
@@ -77,11 +77,8 @@ class Player
 
     update (deltatime)
     {
-        if (this.hp <= 0 && this.state != 'die')
-        {
-            this.state = 'die';
-            this.states[this.state].enter();
-        }
+        if (this.hp <= 0)
+            this.setState(this.y !== this.groundY ? 'falling': 'die');
         this.states[this.state].update();
         this.animations[this.animation_id].update();
         if (this.x < 0)
@@ -162,6 +159,8 @@ function setAnimations()
     anim['jake_roll'].offsetY = -8;
     anim['jake_roll_out'].offsetX = -4;
     anim['jake_roll_out'].offsetY = -4;
+
+    anim['die'].offsetY = 4;
     
     return anim;
 };

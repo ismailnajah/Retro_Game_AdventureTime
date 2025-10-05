@@ -153,8 +153,6 @@ function checkCollisions()
             if (player.state != 'hurt' && !player.isShielded)
             {
                 player.state = 'hurt';
-                player.hurtTimer = 1;
-                player.hp -= 1;
                 player.hardHit = Math.random() < 0.3;
                 player.states[player.state].enter();
             }

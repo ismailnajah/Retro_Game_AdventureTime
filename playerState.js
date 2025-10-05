@@ -220,7 +220,7 @@ const runningState = (_player) => {
 
 const jumpingState = (_player) => {
     const player = _player;
-    
+
     function enter()
     {
         player.yVelocity = -player.jumpStrength;
@@ -550,19 +550,30 @@ const dieState = (_player) => {
 
 const hurtState = (_player) => {
     const player = _player;
+    const gravity = 2;
     
     function enter()
     {
-        // we can be hurt mid air
-        player.xVelocity = 0;
         player.yVelocity = 0;
+        player.xVelocity = 0;
+        player.hurtTimer = 1;
+        player.hp -= 1;
         player.setAnimationId(player.hardHit ? 'hard_hit' : 'hurt');
     }
 
     function update()
     {
+        player.y += player.yVelocity;
+        if (player.y < player.groundY)
+            player.yVelocity += gravity;
+        if (player.y > player.groundY)
+        {
+            player.y = player.groundY;
+            player.yVelocity = 0;
+        }
+        
         const finished = player.animations[player.animation_id].finished();
-        if (finished)
+        if (finished && player.y == player.groundY)
         {
             player.state = 'idle';
             player.states[player.state].enter();
