@@ -12,39 +12,104 @@ body {
   background-color: #181818;
 }
 
+/* Main BMO body */
 #bmoBody {
   border: 1px solid #000;
+  border-radius: 4%;
   aspect-ratio: 3 / 4;
-  background-color: #3db99d;
-  border-radius: 2%;
-
-  /* Responsive scaling */
-  width: min(90vw, 60vh); /* Keeps proportion consistent on all screens */
+  background-color: #3db99cf6;
+  width: min(90vw, 60vh);
   height: auto;
-  display: block;
+
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
 }
 
+/* Screen takes top half */
 #bmoScreen {
-  margin: 5%;
-  aspect-ratio: 4 / 3;
-  width: 90%;
-  border-radius: 2%;
+  margin: 10% 10% 0 10%;
+  border-radius: 4%;
   overflow: hidden;
   border: 1px solid #000;
   background-color: #000;
+  aspect-ratio: 4 / 3;
+  width: 80%;
 }
 
+/* Game canvas fills screen */
 #gameCanvas {
   width: 100%;
   height: 100%;
   display: block;
   border-radius: 5px;
-  image-rendering: pixelated; /* Better for retro games */
+  image-rendering: pixelated;
 }
 
+/* Details take the bottom half */
 #bmoDetails {
-  margin: auto;
-  width: 90%;
-  height: 15%;
+  flex: 1; /* Take remaining space */
+  margin: 0% 10%;
+  border-radius: 2%;
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  align-items: center;
+  /* background-color: tomato; */
+}
+
+#topDetails {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  /* background-color: blue; */
+}
+
+#cassetteSlot {
+  width: 55%;
+  height: 40%;
+  background-color: #0d271a;
+  border: 2px solid #000;
+  border-radius: 2%;
+}
+
+#lightIndicator {
+  width: 8%;
+  margin-right: 8%;
+  aspect-ratio: 1 / 1;
+  background-color: #000064;
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+
+
+#controls {
+  flex: 4;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10%;
+  background-color: green;
+}
+
+#bottomDetails {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+  justify-content: left;
+}
+
+.port{
+  width: 20%;
+  height: 40%;
+  background-color: #0d271a;
+  border: 2px solid #000;
+  border-radius: 20%;
+  margin-right: 10%;
+  background-color: #000064;
 }

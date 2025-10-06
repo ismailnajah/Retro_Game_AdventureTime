@@ -53,10 +53,10 @@ function startScreenDraw()
 {
     drawBackground(true);
     player.draw(ctx, assets);
-    ctx.fillStyle = 'black';
-    ctx.font = `${width * 0.06}px serif`;
+    ctx.fillStyle = '#181818';
+    ctx.font = `${width * 0.1}px "Jersey 10", sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('Press any key to start', width / 2, height * 0.2);
+    ctx.fillText('Press any key to start', width / 2, height * 0.3);
 }
 
 let shouldStop = false;
