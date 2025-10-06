@@ -3,11 +3,8 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 
 const canvas = document.getElementById('gameCanvas');
-const rect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext('2d');
 
-canvas.width = rect.width;
-canvas.height = rect.height;
 const width = canvas.width;
 const height = canvas.height;
 
