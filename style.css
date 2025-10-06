@@ -18,7 +18,7 @@ body {
   border-radius: 4%;
   aspect-ratio: 3 / 4;
   background-color: #3db99cf6;
-  width: min(90vw, 60vh);
+  width: min(98vw, 70vh);
   height: auto;
 
   display: flex;
@@ -84,15 +84,58 @@ body {
   border-radius: 50%;
 }
 
-
 #controls {
   flex: 4;
   width: 100%;
   display: flex;
   justify-content: center;
+  flex-direction: row;
   align-items: center;
-  gap: 10%;
+  /* background-color: green; */
+}
+
+#movePad{
+  width: 50%;
+  height: 100%;
+  /* background-color:chocolate; */
+}
+
+#actionPad{
+  width: 50%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  /* background-color: white; */
+}
+
+.button{
+  /* border: 1px solid #000; */
+  box-shadow: #000 0px 1px 1px 1px;
+}
+
+.buttonPressed{
+  box-shadow: inset gray 0px 0px 2px 2px;
+  scale: 1.5;
+}
+
+#greenCircle{
+  width: 40%;
+  grid-column: 2 / span 2;
+  aspect-ratio: 1 / 1;
   background-color: green;
+  border-radius: 50%;
+  margin-top: 20%;
+}
+
+#redCircle{
+  width: 50%;
+  grid-column: 1 / span 2;
+  aspect-ratio: 1 / 1;
+  background-color: red;
+  border-radius: 50%;
+  margin-bottom: 5%;
 }
 
 #bottomDetails {
@@ -111,5 +154,6 @@ body {
   border: 2px solid #000;
   border-radius: 20%;
   margin-right: 10%;
+  margin-bottom: 10%;
   background-color: #000064;
 }

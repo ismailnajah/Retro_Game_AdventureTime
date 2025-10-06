@@ -2,6 +2,37 @@ import { assetsManager } from "./assets.js";
 import { Player } from "./player.js";
 import { Background } from "./background.js";
 
+
+const redCircle = document.getElementById('redCircle');
+redCircle.addEventListener('touchstart', (e) => {
+    redCircle.classList.remove('button');
+    redCircle.classList.add('buttonPressed');
+    if (!gameStarted)
+        onStart();
+    player.states[player.state].onKeyDown('Space');
+});
+
+redCircle.addEventListener('touchend', (e) => {
+    redCircle.classList.remove('buttonPressed');
+    redCircle.classList.add('button');
+    player.states[player.state].onKeyUp('Space');
+});
+
+redCircle.addEventListener('mousedown', (e) => {
+    redCircle.classList.remove('button');
+    redCircle.classList.add('buttonPressed');
+    if (!gameStarted)
+        onStart();
+    player.states[player.state].onKeyDown('Space');
+});
+
+redCircle.addEventListener('mouseup', (e) => {
+    redCircle.classList.remove('buttonPressed');
+    redCircle.classList.add('button');
+    player.states[player.state].onKeyUp('Space');
+});
+
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -34,15 +65,19 @@ async function startGame()
     player.setState('walking');
     player.maxHeight = height * 0.3;
 
-    window.addEventListener('keydown', function onStart(e) {
-        gameStarted = true;
-        window.removeEventListener('keydown', onStart);
-        player.setState('jakeRollIn');
-        update = transitionUpdate;
-        draw = transitionDraw;
-    });
+    window.addEventListener('keydown', onStart);
     requestAnimationFrame(gameLoop);
 }
+
+function onStart(e)
+{
+    gameStarted = true;
+    window.removeEventListener('keydown', onStart);
+    player.setState('jakeRollIn');
+    update = transitionUpdate;
+    draw = transitionDraw;
+}
+
 
 function startScreenUpdate()
 {
