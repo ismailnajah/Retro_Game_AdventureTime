@@ -113,13 +113,13 @@ const canvasMesh = new THREE.Mesh(planeForCanvas, materialForCanvas);
 canvasMesh.position.set(0, 71, 35);
 scene.add(canvasMesh);
 
-
 // Animation loop
 function animate() {
   requestAnimationFrame(animate);
+  renderer.render(scene, camera);
 //   handleCameraMovement();
 //   controls.update();
-  renderer.render(scene, camera);
+  // renderer.render(scene, camera);
   texture.needsUpdate = true;
 }
 animate();

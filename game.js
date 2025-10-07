@@ -3,34 +3,54 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 
 
-// const redCircle = document.getElementById('redCircle');
-// redCircle.addEventListener('touchstart', (e) => {
-//     redCircle.classList.remove('button');
-//     redCircle.classList.add('buttonPressed');
-//     if (!gameStarted)
-//         onStart();
-//     player.states[player.state].onKeyDown('Space');
-// });
 
-// redCircle.addEventListener('touchend', (e) => {
-//     redCircle.classList.remove('buttonPressed');
-//     redCircle.classList.add('button');
-//     player.states[player.state].onKeyUp('Space');
-// });
+function setupControl(button, key)
+{
+    button.addEventListener('touchstart', (e) => {
+    button.classList.remove('button');
+    button.classList.add('buttonPressed');
+    if (!gameStarted)
+        onStart();
+    player.states[player.state].onKeyDown(key);
+    });
 
-// redCircle.addEventListener('mousedown', (e) => {
-//     redCircle.classList.remove('button');
-//     redCircle.classList.add('buttonPressed');
-//     if (!gameStarted)
-//         onStart();
-//     player.states[player.state].onKeyDown('Space');
-// });
+    button.addEventListener('touchend', (e) => {
+        button.classList.remove('buttonPressed');
+        button.classList.add('button');
+        player.states[player.state].onKeyUp(key);
+    });
 
-// redCircle.addEventListener('mouseup', (e) => {
-//     redCircle.classList.remove('buttonPressed');
-//     redCircle.classList.add('button');
-//     player.states[player.state].onKeyUp('Space');
-// });
+    button.addEventListener('mousedown', (e) => {
+        button.classList.remove('button');
+        button.classList.add('buttonPressed');
+        if (!gameStarted)
+            onStart();
+        player.states[player.state].onKeyDown(key);
+    });
+
+    button.addEventListener('mouseup', (e) => {
+        button.classList.remove('buttonPressed');
+        button.classList.add('button');
+        player.states[player.state].onKeyUp(key);
+    });
+}
+
+const redButton = document.getElementById('redCircle');
+const blueButton = document.getElementById('blueButton');
+setupControl(redButton, 'Space');
+setupControl(blueButton, 'KeyG');
+
+const keys = {
+    'upArrow': 'ArrowUp',
+    'downArrow': 'ArrowDown',
+    'leftArrow': 'ArrowLeft',
+    'rightArrow': 'ArrowRight'
+};
+for (let arrow of document.getElementsByClassName('arrow'))
+{
+    setupControl(arrow, keys[arrow.id]);
+}
+
 
 
 const canvas = document.getElementById('gameCanvas');
