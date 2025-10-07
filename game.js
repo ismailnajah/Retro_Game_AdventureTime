@@ -3,7 +3,7 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 
 
-
+document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
