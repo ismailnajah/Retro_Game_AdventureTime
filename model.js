@@ -42,7 +42,7 @@ controls.update();
 
 const loader = new GLTFLoader();
 loader.load(
-  '/model.glb', // path to your model
+  '3D_models/bmo.glb', // path to your model
   (gltf) => {
     const model = gltf.scene;
     model.scale.set(1000, 1000, 1000);
