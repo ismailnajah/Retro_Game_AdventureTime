@@ -16,10 +16,12 @@ class Player
         this.xVelocity = 0;
         this.yVelocity = 0;
         this.direction = 'right';
+        
         this.speed = 10;
         this.jumpStrength = 25;
         this.maxHeight = 150;
-        
+        this.damage = 20;
+
         this.shouldCombo = false;
         this.hardHit = false;
         this.hurtTimer = 0;

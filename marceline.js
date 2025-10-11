@@ -2,6 +2,7 @@ import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { setStates } from "./marcelineState.js";
 import { boxesIntersect, distance } from "./utils.js";
+import { shieldInState } from "./playerState.js";
 
 class Marceline
 {
@@ -16,6 +17,7 @@ class Marceline
         this.screenHeight = height;
         this.speed = 20;
         this.groundY = y;
+        this.projectiles = [];
 
         this.xVelocity = 0;
         this.yVelocity = 0;
@@ -23,14 +25,14 @@ class Marceline
         this.newX = x;
 
         this.isAttacking = false;
-        this.projectiles = [];
         
-        this.isHuman = false;
+        this.isHuman = true;
         this.immune = false;
-
+        this.immuneTimer = 0;
+        
         this.state = 'idle';
         this.states = setStates(this);
-
+        
         this.animation_id = 'idleFlying';
         this.animations = setAnimations();
     }
@@ -46,6 +48,8 @@ class Marceline
 
     update(deltaTime, player)
     {
+        if (this.immuneTimer > 0)
+            this.immuneTimer--;
         if (this.hitPlayer(player))
             player.hurt(1);
 
@@ -81,9 +85,17 @@ class Marceline
             }
             
         }
+        const player_acttack = boxesIntersect(player_hitbox, this.getHitbox()) && player.isAttacking;     
+        if (player_acttack && !this.isAttacking && !this.immune && this.immuneTimer <= 0)
+        {
+            this.setState('hurt');
+            this.hp -= player.damage;
+            return false;
+        }
         if (!this.isAttacking)
             return false;
-        return boxesIntersect(player_hitbox, this.getHitbox());     
+
+
     }
 
     setAnimationId(id)
@@ -117,22 +129,24 @@ class Marceline
 
     draw(ctx, assets)
     {
+        let shouldDraw = true; 
+        if (this.immuneTimer - 20 > 0 && Math.floor(this.immuneTimer) % 2 == 0)
+                shouldDraw = false;
         
-        ctx.save();
-        let frame = this.animations[this.animation_id];
-        ctx.translate(this.x, this.y);
-        if (this.direction == 'left')
-            ctx.scale(-1, 1);
-        ctx.drawImage(assets.get(frame.sprite_name),
-        frame.x, frame.y, frame.width, frame.height, 
-        -frame.width / 2 + frame.offsetX,
-        -frame.height / 2 + frame.offsetY,
-        frame.width, frame.height);
-        ctx.restore();
-        ctx.strokeStyle = 'red';
-        const hitbox = this.getHitbox();
-        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
-
+        if (shouldDraw)
+        {
+            ctx.save();
+            let frame = this.animations[this.animation_id];
+            ctx.translate(this.x, this.y);
+            if (this.direction == 'left')
+                ctx.scale(-1, 1);
+            ctx.drawImage(assets.get(frame.sprite_name),
+            frame.x, frame.y, frame.width, frame.height, 
+            -frame.width / 2 + frame.offsetX,
+            -frame.height / 2 + frame.offsetY,
+            frame.width, frame.height);
+            ctx.restore();
+        }
         this.projectiles.forEach(p => p.draw(ctx, assets));
     } 
 }
@@ -150,6 +164,7 @@ function setAnimations()
     anim['monsterBat_range_attack'].offsetY = -20;
     anim['monsterBat_attack'].offsetY = -20;
     anim['transform'].offsetY = -20;
+    anim['monsterHurt'].offsetY = -20;
 
     anim['guitar_out'].offsetY = -6;
     anim['guitar_out'].offsetX = 4;
