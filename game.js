@@ -179,72 +179,16 @@ function endGame()
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = 'white';
     ctx.font = '48px serif';
+    ctx.textAlign = 'center';
     ctx.fillText('Game Over', width / 2, height / 2);
 }
 
 function gameUpdate(deltaTime)
 {
-    // updateProjectiles(deltaTime);
-    checkCollisions();
     player.update(deltaTime);
     boss.update(deltaTime);
-}
-
-function collidesWith(a, b)
-{
-    return a.x < b.x + 10 && a.x + a.width > b.x - 10 &&
-           a.y < b.y + 10 && a.y + a.height > b.y - 10;
-}
-
-function checkCollisions()
-{
-    if (player.state == 'die')
-        return;
-    const player_hitbox = player.getHitbox();
-    for (let p of projectiles)
-    {
-        if (collidesWith(player_hitbox, p))
-        {
-            if (player.state != 'hurt' && !player.isShielded)
-            {
-                player.state = 'hurt';
-                player.hardHit = Math.random() < 0.3;
-                player.states[player.state].enter();
-            }
-            p.x = -100;   
-        }
-    }
-}
-
-function updateProjectiles(deltaTime)
-{
-    if (Math.random() < 0.02)
-    {
-        let speed = 200 + Math.random() * 100;
-        let projectile = {
-            x: width + 10,
-            y: height - 80 + Math.random() * 30,
-            xVelocity: -speed,
-            yVelocity: 0
-        };
-        projectiles.push(projectile);
-    }
-    
-    for (let projectile of projectiles)
-    {
-        projectile.x += projectile.xVelocity * deltaTime;
-        projectile.y += projectile.yVelocity * deltaTime;
-    }
-    if (projectiles.length > 10)
-        projectiles.splice(0, projectiles.length - 10);
-}
-
-function drawProjectiles()
-{
-    for (let projectile of projectiles)
-    {
-        drawPoint(projectile.x, projectile.y);
-    }
+    if (boss.hitPlayer(player))
+        player.hurt(1);
 }
 
 function gameDraw()
@@ -254,16 +198,6 @@ function gameDraw()
     drawHpBar();
     boss.draw(ctx, assets);
     player.draw(ctx, assets);
-    drawProjectiles();
-}
-
-function drawPoint(x, y)
-{
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.closePath();
 }
 
 function drawBackground(moveBackground = false)

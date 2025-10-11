@@ -1,4 +1,4 @@
-import { marcelineSpritesMetaData } from "./MarcelineSpritesMetadata.js";
+import { marcelineSpritesMetadata } from "./MarcelineSpritesMetadata.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { setStates } from "./marcelineState.js";
 
@@ -59,13 +59,21 @@ class Marceline
         const player_hitbox = player.getHitbox();
         for (const p of this.projectiles)
         {
-            const p_hitbox = p.getHitbox();
-            if (player_hitbox.x < p.x + 10 && player_hitbox.x + player_hitbox.width > p.x - 10 &&
-                player_hitbox.y < p.y + 10 && player_hitbox.y + player_hitbox.height > p.y - 10)
+            if (p.isExploded || p.state != 'moving')
+                continue;
+            const hitbox = p.getHitbox();
+            if (player_hitbox.x > hitbox.x &&
+                player_hitbox.x < hitbox.x + hitbox.width &&
+                player_hitbox.y > hitbox.y &&
+                player_hitbox.y < hitbox.y + hitbox.height)
             {
+                p.exploade();
+                player.hardHit = true;
                 return true;
             }
+            
         }
+        return false;
     }
 
     setAnimationId(id)
@@ -123,8 +131,8 @@ function setAnimations()
 {
     let anim = {};
 
-    for (const key in marcelineSpritesMetaData)
-        anim[key] = AnimationfromMetadata(key, marcelineSpritesMetaData);
+    for (const key in marcelineSpritesMetadata)
+        anim[key] = AnimationfromMetadata(key, marcelineSpritesMetadata);
     return anim;
 }
 

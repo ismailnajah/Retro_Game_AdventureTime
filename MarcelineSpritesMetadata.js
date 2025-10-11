@@ -1,4 +1,4 @@
-export const marcelineSpritesMetaData = {
+export const marcelineSpritesMetadata = {
     "bat_flying": {
         "path": "assets/Marceline_sprites/bat_flying_32_6.png",
         "frame_w": 32,
@@ -268,50 +268,6 @@ export const marcelineSpritesMetaData = {
                 "y": 11,
                 "width": 51,
                 "height": 58
-            }
-        ]
-    },
-    "hurt": {
-        "path": "assets/Marceline_sprites/hurt_72_6.png",
-        "frame_w": 72,
-        "frame_h": 72,
-        "frames": 6,
-        "hitboxes": [
-            {
-                "x": 9,
-                "y": 20,
-                "width": 51,
-                "height": 52
-            },
-            {
-                "x": 5,
-                "y": 12,
-                "width": 64,
-                "height": 57
-            },
-            {
-                "x": 7,
-                "y": 11,
-                "width": 62,
-                "height": 58
-            },
-            {
-                "x": 9,
-                "y": 10,
-                "width": 59,
-                "height": 60
-            },
-            {
-                "x": 15,
-                "y": 12,
-                "width": 45,
-                "height": 57
-            },
-            {
-                "x": 19,
-                "y": 13,
-                "width": 43,
-                "height": 48
             }
         ]
     },
@@ -1051,6 +1007,50 @@ export const marcelineSpritesMetaData = {
                 "y": 45,
                 "width": 117,
                 "height": 113
+            }
+        ]
+    },
+    "marceline_hurt": {
+        "path": "assets/Marceline_sprites/marceline_hurt_72_6.png",
+        "frame_w": 72,
+        "frame_h": 72,
+        "frames": 6,
+        "hitboxes": [
+            {
+                "x": 9,
+                "y": 20,
+                "width": 51,
+                "height": 52
+            },
+            {
+                "x": 5,
+                "y": 12,
+                "width": 64,
+                "height": 57
+            },
+            {
+                "x": 7,
+                "y": 11,
+                "width": 62,
+                "height": 58
+            },
+            {
+                "x": 9,
+                "y": 10,
+                "width": 59,
+                "height": 60
+            },
+            {
+                "x": 15,
+                "y": 12,
+                "width": 45,
+                "height": 57
+            },
+            {
+                "x": 19,
+                "y": 13,
+                "width": 43,
+                "height": 48
             }
         ]
     }

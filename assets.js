@@ -1,5 +1,5 @@
-import { fennSpritesMetaData } from './fennSpritesMetaData.js';
-import { marcelineSpritesMetaData } from './MarcelineSpritesMetadata.js';
+import { fennSpritesMetadata } from './fennSpritesMetadata.js';
+import { marcelineSpritesMetadata } from './MarcelineSpritesMetadata.js';
 
 function assetManager()
 {
@@ -35,12 +35,12 @@ function assetManager()
 
 let assetsManager = () => {
     let manager = assetManager();
-    for(let key in fennSpritesMetaData) {
-        manager.add(key, fennSpritesMetaData[key].path);
+    for(let key in fennSpritesMetadata) {
+        manager.add(key, fennSpritesMetadata[key].path);
     }
     
-    for(let key in marcelineSpritesMetaData) {
-        manager.add(key, marcelineSpritesMetaData[key].path);
+    for(let key in marcelineSpritesMetadata) {
+        manager.add(key, marcelineSpritesMetadata[key].path);
     }
     // Hp bar assets
     manager.add('hp_bar', 'assets/ui/hp_bar.png');

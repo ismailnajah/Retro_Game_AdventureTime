@@ -37,11 +37,14 @@ const monsterRangeAttackState = (marceline) => {
                 );
             }
             if (finished) {
-                // marceline.setState('idle');
+                marceline.setState('idle');
             }
         },
     }
 }
+
+
+
 
 export function setStates(marceline)
 {

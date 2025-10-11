@@ -1,6 +1,6 @@
 import * as playerState from "./playerState.js";
-import { Animation } from "./animation.js";
-import { fennSpritesMetaData } from "./fennSpritesMetaData.js";
+import { AnimationfromMetadata } from "./animation.js";
+import { fennSpritesMetadata } from "./fennSpritesMetadata.js";
 
 class Player
 {
@@ -21,7 +21,7 @@ class Player
         this.maxHeight = 150;
         
         this.shouldCombo = false;
-        this.hardHit = true;
+        this.hardHit = false;
         this.hurtTimer = 0;
         this.shieldUp = false;
         this.isDead = false;
@@ -34,6 +34,16 @@ class Player
         this.animations = setAnimations();
     }
     
+    hurt(damage)
+    {
+        if (this.hurtTimer > 0 || this.isDead || this.shieldUp)
+            return;
+        this.hp -= damage;
+        if (this.hp <= 0)
+            this.setState('die');
+        else 
+            this.setState('hurt');
+    }
     move(direction = null)
     {
         if (!direction)
@@ -103,6 +113,7 @@ class Player
             this.setState(this.y !== this.groundY ? 'falling': 'die');
         this.states[this.state].update();
         this.animations[this.animation_id].update();
+        console.log(this.hp);
     }
 
     getHitbox()
@@ -153,11 +164,8 @@ function setStates(player)
 function setAnimations()
 {
     let anim = {};
-    for (const key in fennSpritesMetaData)
-    {
-        let data = fennSpritesMetaData[key];
-        anim[key] = new Animation(key, data.frame_w, data.frame_h, data.frames, data.hitboxes);
-    }
+    for (const key in fennSpritesMetadata)
+        anim[key] = AnimationfromMetadata(key, fennSpritesMetadata);
 
     //manualy tweak some animations
     anim['jump'].repeated = false;

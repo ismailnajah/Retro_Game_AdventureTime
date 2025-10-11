@@ -518,6 +518,7 @@ const dieState = (_player) => {
     function enter()
     {
         player.stop();
+        player.hp = 0;
         player.setAnimationId('die');
     }
     
@@ -545,10 +546,8 @@ const hurtState = (_player) => {
     
     function enter()
     {
-        player.yVelocity = 0;
-        player.xVelocity = 0;
-        player.hurtTimer = 1;
-        player.hp -= 1;
+        player.stop();
+        player.hurtTimer = 1.0;
         player.setAnimationId(player.hardHit ? 'hard_hit' : 'hurt');
     }
 

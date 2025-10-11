@@ -1,4 +1,4 @@
-export const fennSpritesMetaData = {
+export const fennSpritesMetadata = {
     "shield_out": {
         "path": "assets/Fenn_sprites/shield_out_64_7.png",
         "frame_w": 64,

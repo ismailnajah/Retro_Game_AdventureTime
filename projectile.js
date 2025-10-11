@@ -1,5 +1,5 @@
 import { AnimationfromMetadata } from "./animation.js";
-import { marcelineSpritesMetaData } from "./MarcelineSpritesMetadata.js";
+import { marcelineSpritesMetadata } from "./MarcelineSpritesMetadata.js";
 
 class Projectile {
     constructor(x, y, direction, movingAnimationId, explosionAnimationId) {
@@ -8,8 +8,8 @@ class Projectile {
         this.direction = direction; // 'left' or 'right'
         this.speed = 5;
 
-        this.movingAnimation = AnimationfromMetadata(movingAnimationId, marcelineSpritesMetaData);
-        this.explosionAnimation = AnimationfromMetadata(explosionAnimationId, marcelineSpritesMetaData);
+        this.movingAnimation = AnimationfromMetadata(movingAnimationId, marcelineSpritesMetadata);
+        this.explosionAnimation = AnimationfromMetadata(explosionAnimationId, marcelineSpritesMetadata);
 
         
         this.state = 'moving'; // 'moving' or 'exploding'
@@ -65,6 +65,14 @@ class Projectile {
             width: hitbox.width,
             height: hitbox.height,
         };
+    }
+
+    exploade()
+    {
+        if (this.state !== 'exploding') {
+            this.state = 'exploding';
+            this.explosionAnimation.reset();
+        }
     }
 
 }
