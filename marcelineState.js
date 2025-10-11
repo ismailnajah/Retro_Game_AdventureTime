@@ -7,8 +7,104 @@ const idleState = (marceline) => {
         },
         update: () => {
             marceline.y = marceline.groundY - 10 + Math.sin(Date.now() / 150) * 5;
-            if (Math.random() < 0.5)
-                marceline.setState('transform');
+            if (marceline.hp <= marceline.maxHp / 2)
+                marceline.setState('monsterTransform');
+            if (Math.random() < 0.05)
+                marceline.setState('guitarOut');
+        },
+    }
+}
+
+const guitarOutState = (marceline) => {
+    return {
+        enter: () => {
+            marceline.immune = true;
+            marceline.setAnimationId('guitar_out');
+        },
+        update: () => {
+            const finished = marceline.animations[marceline.animation_id].finished();
+            if (finished) {
+                marceline.setState('guitarAttack');
+            }
+        },
+    }
+}
+
+const guitarAttackState = (marceline) => {
+    let timer = 0;
+    return {
+        enter: () => {
+            const duration = 15;
+            timer = Math.floor(Math.random() * duration) + duration;
+            marceline.setAnimationId('guitar_attack');
+        },
+        update: () => {
+            marceline.y = marceline.groundY - 10 + Math.sin(Date.now() / 150) * 5;
+            const finished = marceline.animations[marceline.animation_id].finished();
+            const dir = marceline.direction;
+            const offset = 0;
+            if (timer % 10 === 0) {
+                marceline.projectiles.push(
+                    new Projectile(
+                        marceline.x + ( dir === 'right' ? offset : -offset ), 
+                        marceline.y,
+                        marceline.direction,
+                        'music_notes_moving',
+                        'music_notes_exploding'
+                    )
+                );
+            }
+            timer -= 1;
+            if (finished && timer <= 0) {
+                marceline.setState('guitarIn');
+                timer = 0;
+            }
+        },
+    }
+}
+
+const startTeleportState = (marceline) => {
+    return {
+        enter: () => {
+            marceline.setAnimationId('teleport');
+        },
+        update: () => {
+            const finished = marceline.animations[marceline.animation_id].finished();
+            if (finished) {
+                marceline.x =  marceline.newX;
+                marceline.setState('endTeleport')
+            }
+        },
+    }
+}
+
+const endTeleportState = (marceline) => {
+    return {
+        enter: () => {
+            marceline.setAnimationId('teleport');
+            marceline.animations[marceline.animation_id].reverse();
+        },
+        update: () => {
+            const finished = marceline.animations[marceline.animation_id].finished();
+            if (finished) {
+                marceline.setState('guitarAttack');
+            }
+        },
+    }
+}
+
+const guitarInState = (marceline) => {
+    return {
+        enter: () => {
+            marceline.setAnimationId('guitar_out');
+            marceline.animations[marceline.animation_id].reverse();
+        },
+        update: () => {
+            const finished = marceline.animations[marceline.animation_id].finished();
+            if (finished) {
+                marceline.immune = false;
+                marceline.setState('idle');
+            }
         },
     }
 }
@@ -18,9 +114,10 @@ const monsterIdleState = (marceline) => {
         enter: () => {
             marceline.setAnimationId('monsterIdle');
             marceline.isAttacking = false;
+            marceline.isHuman = false;
         },
         update: () => {
-            if (Math.random() < 0.00)
+            if (Math.random() < 0.03)
                 marceline.setState('monsterRangeAttack');
             else if (Math.random() < 0.02)
                 marceline.setState('monsterMeleeAttack');
@@ -28,11 +125,10 @@ const monsterIdleState = (marceline) => {
     }
 }
 
-const transformState = (marceline) => {
+const monsterTransformState = (marceline) => {
     return {
         enter: () => {
             const hitbox = marceline.getHitbox();
-            marceline.y = marceline.groundY - 35;
             marceline.setAnimationId('transform');
         },
         update: () => {
@@ -57,7 +153,7 @@ const monsterRangeAttackState = (marceline) => {
                 marceline.projectiles.push(
                     new Projectile(
                         marceline.x + ( dir === 'right' ? offset : -offset ), 
-                        marceline.y + 20,
+                        marceline.y,
                         marceline.direction,
                         'monster_projectile_moving',
                         'monster_projectile_exploding'
@@ -93,9 +189,14 @@ export function setStates(marceline)
 {
     return {
         'idle': idleState(marceline),
+        'guitarOut': guitarOutState(marceline),
+        'guitarAttack': guitarAttackState(marceline),
+        'startTeleport': startTeleportState(marceline),
+        'endTeleport': endTeleportState(marceline),
+        'guitarIn': guitarInState(marceline),
         'monsterIdle': monsterIdleState(marceline),
         'monsterRangeAttack': monsterRangeAttackState(marceline),
         'monsterMeleeAttack': monsterMeleeAttackState(marceline),
-        'transform': transformState(marceline),
+        'monsterTransform': monsterTransformState(marceline),
     };
 }

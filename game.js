@@ -69,9 +69,8 @@ let assets = assetsManager();
 
 let projectiles = [];
 
-console.log(canvas.width, canvas.height);
 const player = new Player(width / 2, height - 60, width, height);
-const boss = new Marceline(width * 0.8, height - 70, width, height);
+const boss = new Marceline(width * 0.8, height - 60, width, height);
 
 let gameStarted = false;
 // let update = startScreenUpdate;
@@ -186,9 +185,7 @@ function endGame()
 function gameUpdate(deltaTime)
 {
     player.update(deltaTime);
-    boss.update(deltaTime);
-    if (boss.hitPlayer(player))
-        player.hurt(1);
+    boss.update(deltaTime, player);
 }
 
 function gameDraw()

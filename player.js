@@ -36,7 +36,7 @@ class Player
     
     hurt(damage)
     {
-        if (this.hurtTimer > 0 || this.isDead || this.shieldUp)
+        if (this.hurtTimer > 0 || this.isDead || this.shieldUp || this.isAttacking)
             return;
         this.hp -= damage;
         if (this.hp <= 0)
@@ -113,7 +113,6 @@ class Player
             this.setState(this.y !== this.groundY ? 'falling': 'die');
         this.states[this.state].update();
         this.animations[this.animation_id].update();
-        console.log(this.hp);
     }
 
     getHitbox()

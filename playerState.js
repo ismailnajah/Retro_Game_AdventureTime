@@ -626,6 +626,7 @@ const swordAttackState = (_player) => {
     function enter()
     {
         player.setAnimationId('sword_attack');
+        player.isAttacking = true;
     }
 
     function update()
@@ -672,6 +673,7 @@ const swordInState = (_player) => {
     {
         player.setAnimationId('sword_out');
         player.animations[player.animation_id].reverse();
+        player.isAttacking = false;
     }
     
     function update()

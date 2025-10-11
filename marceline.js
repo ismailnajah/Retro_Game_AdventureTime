@@ -1,7 +1,7 @@
-import { marcelineSpritesMetadata } from "./MarcelineSpritesMetadata.js";
+import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { setStates } from "./marcelineState.js";
-import { boxesIntersect } from "./utils.js";
+import { boxesIntersect, distance } from "./utils.js";
 
 class Marceline
 {
@@ -20,11 +20,13 @@ class Marceline
         this.xVelocity = 0;
         this.yVelocity = 0;
         this.maxHeight = 50;
+        this.newX = x;
 
         this.isAttacking = false;
         this.projectiles = [];
         
         this.isHuman = false;
+        this.immune = false;
 
         this.state = 'idle';
         this.states = setStates(this);
@@ -42,8 +44,11 @@ class Marceline
         }
     }
 
-    update(deltaTime)
+    update(deltaTime, player)
     {
+        if (this.hitPlayer(player))
+            player.hurt(1);
+
         if (Math.floor(Date.now() / 50) % 2 == 0)
         {
             this.states[this.state].update();
@@ -53,6 +58,12 @@ class Marceline
         this.projectiles = this.projectiles.filter(
             p => (!p.isExploded && p.x > -50 && p.x < this.screenWidth + 50)
         );
+        if (this.state === "guitarAttack" && distance(this, player) < 80)
+        {
+            this.newX = player.x + (this.x < player.x ? 150 : -150);
+            this.setState("startTeleport");
+        }
+        this.direction = player.x > this.x ? 'right' : 'left';
     }
 
     hitPlayer(player)
@@ -72,8 +83,7 @@ class Marceline
         }
         if (!this.isAttacking)
             return false;
-        return boxesIntersect(player_hitbox, this.getHitbox());
-        
+        return boxesIntersect(player_hitbox, this.getHitbox());     
     }
 
     setAnimationId(id)
@@ -133,7 +143,18 @@ function setAnimations()
 
     for (const key in marcelineSpritesMetadata)
         anim[key] = AnimationfromMetadata(key, marcelineSpritesMetadata);
+    
+    // Adjust offsets for better alignment
     anim['monsterBat_attack'].offsetX = 20;
+    anim['monsterIdle'].offsetY = -20;
+    anim['monsterBat_range_attack'].offsetY = -20;
+    anim['monsterBat_attack'].offsetY = -20;
+    anim['transform'].offsetY = -20;
+
+    anim['guitar_out'].offsetY = -6;
+    anim['guitar_out'].offsetX = 4;
+    anim['teleport'].offsetY = -6;
+    anim['teleport'].offsetX = 4;
     return anim;
 }
 

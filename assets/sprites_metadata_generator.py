@@ -19,20 +19,11 @@ def get_hitbox_from_frame(image):
     # Find main contour
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not contours:
-        return None
+        return {'x': 0, 'y': 0, 'width': 0, 'height': 0}
 
     c = max(contours, key=cv2.contourArea)
     x, y, w, h = cv2.boundingRect(c)
     return {'x' : x, 'y' : y, 'width': w, 'height': h}
-
-def draw_hitbox(image, hitbox, color=(0, 255, 0, 255)):
-    """Draw hitbox rectangle on the sprite image."""
-    x, y, w, h = hitbox
-    img_copy = image.copy()
-    if img_copy.shape[2] == 4:
-        img_copy = cv2.cvtColor(img_copy, cv2.COLOR_BGRA2BGR)
-    cv2.rectangle(img_copy, (x, y), (x + w, y + h), color, 2)
-    return img_copy
 
 def extract_frames(spritesheet, frame_width, frame_height):
     """Slice the spritesheet into frames horizontally."""

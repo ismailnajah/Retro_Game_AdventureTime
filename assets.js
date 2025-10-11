@@ -1,5 +1,5 @@
 import { fennSpritesMetadata } from './fennSpritesMetadata.js';
-import { marcelineSpritesMetadata } from './MarcelineSpritesMetadata.js';
+import { marcelineSpritesMetadata } from './marcelineSpritesMetadata.js';
 
 function assetManager()
 {

@@ -710,6 +710,12 @@ export const marcelineSpritesMetadata = {
                 "y": 37,
                 "width": 4,
                 "height": 5
+            },
+            {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
             }
         ]
     },
@@ -774,7 +780,20 @@ export const marcelineSpritesMetadata = {
         "frame_w": 32,
         "frame_h": 32,
         "frames": 2,
-        "hitboxes": []
+        "hitboxes": [
+            {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+            },
+            {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+            }
+        ]
     },
     "music_notes_moving": {
         "path": "assets/Marceline_sprites/music_notes_moving_32_9.png",
@@ -903,6 +922,12 @@ export const marcelineSpritesMetadata = {
                 "y": 30,
                 "width": 4,
                 "height": 18
+            },
+            {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
             }
         ]
     },

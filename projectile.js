@@ -1,18 +1,18 @@
 import { AnimationfromMetadata } from "./animation.js";
-import { marcelineSpritesMetadata } from "./MarcelineSpritesMetadata.js";
+import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
 
 class Projectile {
     constructor(x, y, direction, movingAnimationId, explosionAnimationId) {
         this.x = x;
         this.y = y;
-        this.direction = direction; // 'left' or 'right'
+        this.direction = direction;
         this.speed = 5;
 
         this.movingAnimation = AnimationfromMetadata(movingAnimationId, marcelineSpritesMetadata);
         this.explosionAnimation = AnimationfromMetadata(explosionAnimationId, marcelineSpritesMetadata);
 
         
-        this.state = 'moving'; // 'moving' or 'exploding'
+        this.state = 'moving';
 
         this.isExploded = false;
     }
@@ -46,9 +46,6 @@ class Projectile {
                 -frame.height / 2 + frame.offsetY,
                 frame.width, frame.height);
         ctx.restore();
-        ctx.strokeStyle = 'red';
-        const hitbox = this.getHitbox();
-        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
     }
 
     getHitbox()
