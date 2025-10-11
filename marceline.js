@@ -1,6 +1,7 @@
 import { marcelineSpritesMetadata } from "./MarcelineSpritesMetadata.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { setStates } from "./marcelineState.js";
+import { boxesIntersect } from "./utils.js";
 
 class Marceline
 {
@@ -61,11 +62,7 @@ class Marceline
         {
             if (p.isExploded || p.state != 'moving')
                 continue;
-            const hitbox = p.getHitbox();
-            if (player_hitbox.x > hitbox.x &&
-                player_hitbox.x < hitbox.x + hitbox.width &&
-                player_hitbox.y > hitbox.y &&
-                player_hitbox.y < hitbox.y + hitbox.height)
+            if (boxesIntersect(player_hitbox, p.getHitbox()))
             {
                 p.exploade();
                 player.hardHit = true;
@@ -73,7 +70,10 @@ class Marceline
             }
             
         }
-        return false;
+        if (!this.isAttacking)
+            return false;
+        return boxesIntersect(player_hitbox, this.getHitbox());
+        
     }
 
     setAnimationId(id)
@@ -133,6 +133,7 @@ function setAnimations()
 
     for (const key in marcelineSpritesMetadata)
         anim[key] = AnimationfromMetadata(key, marcelineSpritesMetadata);
+    anim['monsterBat_attack'].offsetX = 20;
     return anim;
 }
 
