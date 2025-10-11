@@ -1,6 +1,6 @@
-export const playerAssetsData = {
+export const fennSpritesMetaData = {
     "shield_out": {
-        "path": "sprites/shield_out_64_7.png",
+        "path": "assets/Fenn_sprites/shield_out_64_7.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 7,
@@ -50,7 +50,7 @@ export const playerAssetsData = {
         ]
     },
     "win1": {
-        "path": "sprites/win1_64_35.png",
+        "path": "assets/Fenn_sprites/win1_64_35.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 35,
@@ -268,7 +268,7 @@ export const playerAssetsData = {
         ]
     },
     "shield_in": {
-        "path": "sprites/shield_in_64_7.png",
+        "path": "assets/Fenn_sprites/shield_in_64_7.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 7,
@@ -318,7 +318,7 @@ export const playerAssetsData = {
         ]
     },
     "shield_walk": {
-        "path": "sprites/shield_walk_64_6.png",
+        "path": "assets/Fenn_sprites/shield_walk_64_6.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 6,
@@ -362,7 +362,7 @@ export const playerAssetsData = {
         ]
     },
     "die": {
-        "path": "sprites/die_64_18.png",
+        "path": "assets/Fenn_sprites/die_64_18.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 18,
@@ -478,7 +478,7 @@ export const playerAssetsData = {
         ]
     },
     "win2": {
-        "path": "sprites/win2_64_35.png",
+        "path": "assets/Fenn_sprites/win2_64_35.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 35,
@@ -696,7 +696,7 @@ export const playerAssetsData = {
         ]
     },
     "hard_hit": {
-        "path": "sprites/hard_hit_64_13.png",
+        "path": "assets/Fenn_sprites/hard_hit_64_13.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 13,
@@ -782,7 +782,7 @@ export const playerAssetsData = {
         ]
     },
     "duck": {
-        "path": "sprites/duck_64_3.png",
+        "path": "assets/Fenn_sprites/duck_64_3.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 3,
@@ -808,7 +808,7 @@ export const playerAssetsData = {
         ]
     },
     "hurt": {
-        "path": "sprites/hurt_64_4.png",
+        "path": "assets/Fenn_sprites/hurt_64_4.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 4,
@@ -840,7 +840,7 @@ export const playerAssetsData = {
         ]
     },
     "idle4": {
-        "path": "sprites/idle4_64_21.png",
+        "path": "assets/Fenn_sprites/idle4_64_21.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 21,
@@ -974,7 +974,7 @@ export const playerAssetsData = {
         ]
     },
     "idle1": {
-        "path": "sprites/idle1_64_12.png",
+        "path": "assets/Fenn_sprites/idle1_64_12.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 12,
@@ -1054,7 +1054,7 @@ export const playerAssetsData = {
         ]
     },
     "idle3": {
-        "path": "sprites/idle3_64_12.png",
+        "path": "assets/Fenn_sprites/idle3_64_12.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 12,
@@ -1134,7 +1134,7 @@ export const playerAssetsData = {
         ]
     },
     "idle2": {
-        "path": "sprites/idle2_64_12.png",
+        "path": "assets/Fenn_sprites/idle2_64_12.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 12,
@@ -1214,7 +1214,7 @@ export const playerAssetsData = {
         ]
     },
     "run": {
-        "path": "sprites/run_64_12.png",
+        "path": "assets/Fenn_sprites/run_64_12.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 12,
@@ -1294,7 +1294,7 @@ export const playerAssetsData = {
         ]
     },
     "walk": {
-        "path": "sprites/walk_64_17.png",
+        "path": "assets/Fenn_sprites/walk_64_17.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 17,
@@ -1404,7 +1404,7 @@ export const playerAssetsData = {
         ]
     },
     "jump": {
-        "path": "sprites/jump_64_5.png",
+        "path": "assets/Fenn_sprites/jump_64_5.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 5,
@@ -1442,7 +1442,7 @@ export const playerAssetsData = {
         ]
     },
     "fall": {
-        "path": "sprites/fall_64_5.png",
+        "path": "assets/Fenn_sprites/fall_64_5.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 5,
@@ -1480,7 +1480,7 @@ export const playerAssetsData = {
         ]
     },
     "land": {
-        "path": "sprites/land_64_5.png",
+        "path": "assets/Fenn_sprites/land_64_5.png",
         "frame_w": 64,
         "frame_h": 64,
         "frames": 5,
@@ -1518,7 +1518,7 @@ export const playerAssetsData = {
         ]
     },
     "jake_roll": {
-        "path": "sprites/jake_roll_72_9.png",
+        "path": "assets/Fenn_sprites/jake_roll_72_9.png",
         "frame_w": 72,
         "frame_h": 72,
         "frames": 9,
@@ -1580,7 +1580,7 @@ export const playerAssetsData = {
         ]
     },
     "jake_roll_in": {
-        "path": "sprites/jake_roll_in_72_7.png",
+        "path": "assets/Fenn_sprites/jake_roll_in_72_7.png",
         "frame_w": 72,
         "frame_h": 72,
         "frames": 7,
@@ -1630,7 +1630,7 @@ export const playerAssetsData = {
         ]
     },
     "jake_roll_out": {
-        "path": "sprites/jake_roll_out_72_19.png",
+        "path": "assets/Fenn_sprites/jake_roll_out_72_19.png",
         "frame_w": 72,
         "frame_h": 72,
         "frames": 19,
@@ -1752,7 +1752,7 @@ export const playerAssetsData = {
         ]
     },
     "sword_combo": {
-        "path": "sprites/sword_combo_92_12.png",
+        "path": "assets/Fenn_sprites/sword_combo_92_12.png",
         "frame_w": 92,
         "frame_h": 92,
         "frames": 12,
@@ -1832,7 +1832,7 @@ export const playerAssetsData = {
         ]
     },
     "sword_attack": {
-        "path": "sprites/sword_attack_92_6.png",
+        "path": "assets/Fenn_sprites/sword_attack_92_6.png",
         "frame_w": 92,
         "frame_h": 92,
         "frames": 6,
@@ -1876,7 +1876,7 @@ export const playerAssetsData = {
         ]
     },
     "sword_out": {
-        "path": "sprites/sword_out_92_3.png",
+        "path": "assets/Fenn_sprites/sword_out_92_3.png",
         "frame_w": 92,
         "frame_h": 92,
         "frames": 3,

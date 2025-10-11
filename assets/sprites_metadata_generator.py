@@ -103,4 +103,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate JSON data for spritesheets {path, frame_w, frame_h, hitboxes[]}.")
     parser.add_argument("--path", required=True, help="Path to spritesheets folder.")
     args = parser.parse_args()
-    json.dump(process_sprites(args.path), open("hitboxes.json", "w"), indent=4)
+    outfile = "".join([str.capitalize(s) for s in args.path.split("/")[-1].split("_")]) + "Metadata.json"
+    print(f"Writing output to {outfile}")
+    json.dump(process_sprites(args.path), open(outfile, "w"), indent=4)

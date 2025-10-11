@@ -1,28 +1,31 @@
 import * as playerState from "./playerState.js";
-import { animation } from "./animation.js";
-import { playerAssetsData } from "./playerAssetsData.js";
+import { Animation } from "./animation.js";
+import { fennSpritesMetaData } from "./fennSpritesMetaData.js";
 
 class Player
 {
-    constructor(x, y)
+    constructor(x, y, screenWidth, screenHeight)
     {
         this.maxHp = 8;
         this.hp = 8;
         this.x = x;
         this.y = y;
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
         this.groundY = y;
         this.xVelocity = 0;
         this.yVelocity = 0;
         this.direction = 'right';
-        this.speed = 8;
-        this.jumpStrength = 20;
+        this.speed = 10;
+        this.jumpStrength = 25;
         this.maxHeight = 150;
         
         this.shouldCombo = false;
         this.hardHit = true;
         this.hurtTimer = 0;
-        this.isShielded = false;
+        this.shieldUp = false;
         this.isDead = false;
+        this.isAttacking = false;
 
         this.state = 'idle';
         this.states = setStates(this);
@@ -31,6 +34,25 @@ class Player
         this.animations = setAnimations();
     }
     
+    move(direction = null)
+    {
+        if (!direction)
+            direction = this.direction;
+        this.direction = direction;
+        this.x += this.direction === 'right' ? this.xVelocity : -this.xVelocity;
+        if (this.x < 0)
+            this.x = 0;
+        const hitbox = this.getHitbox();
+        if (this.x > this.screenWidth)
+            this.x = this.screenWidth;
+    }
+
+    stop()
+    {
+        this.xVelocity = 0;
+        this.yVelocity = 0;
+    }
+
     setAnimationId(id)
     {
         if (this.animation_id !== id)
@@ -70,9 +92,9 @@ class Player
                 -frame.height / 2 + frame.offsetY,
                 frame.width, frame.height);
         ctx.restore();
-        // ctx.strokeStyle = 'red';
-        // const hitbox = this.getHitbox();
-        // ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        ctx.strokeStyle = 'red';
+        const hitbox = this.getHitbox();
+        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
     }
 
     update (deltatime)
@@ -81,12 +103,14 @@ class Player
             this.setState(this.y !== this.groundY ? 'falling': 'die');
         this.states[this.state].update();
         this.animations[this.animation_id].update();
-        if (this.x < 0)
-            this.x = 0;
     }
 
     getHitbox()
     {
+        // hitbox offset for less punishing collisions
+        const offsetX = 5;
+        const offsetY = 5;
+
         const frame = this.animations[this.animation_id];
         const currentFrame = frame.currentFrame
         const hitbox = frame.hitboxes[currentFrame];
@@ -94,10 +118,10 @@ class Player
         if (this.direction === 'left')
             hitbox_x = frame.width - hitbox.x - hitbox.width - frame.offsetX;
         return {
-            x: this.x + hitbox_x - frame.width / 2,
-            y: this.y + hitbox.y - frame.height / 2 + frame.offsetY,
-            width: hitbox.width,
-            height: hitbox.height
+            x: this.x + hitbox_x - frame.width / 2 + offsetX,
+            y: this.y + hitbox.y - frame.height / 2 + frame.offsetY + offsetY,
+            width: hitbox.width - offsetX * 2,
+            height: hitbox.height - offsetY * 2,
         };
     }
 }
@@ -129,10 +153,10 @@ function setStates(player)
 function setAnimations()
 {
     let anim = {};
-    for (let key in playerAssetsData)
+    for (const key in fennSpritesMetaData)
     {
-        let data = playerAssetsData[key];
-        anim[key] = new animation(key, data.frame_w, data.frame_h, data.frames, data.hitboxes);
+        let data = fennSpritesMetaData[key];
+        anim[key] = new Animation(key, data.frame_w, data.frame_h, data.frames, data.hitboxes);
     }
 
     //manualy tweak some animations

@@ -1,4 +1,5 @@
-import { playerAssetsData } from './playerAssetsData.js';
+import { fennSpritesMetaData } from './fennSpritesMetaData.js';
+import { marcelineSpritesMetaData } from './MarcelineSpritesMetadata.js';
 
 function assetManager()
 {
@@ -34,19 +35,22 @@ function assetManager()
 
 let assetsManager = () => {
     let manager = assetManager();
-    for(let key in playerAssetsData) {
-        manager.add(key, playerAssetsData[key].path);
+    for(let key in fennSpritesMetaData) {
+        manager.add(key, fennSpritesMetaData[key].path);
     }
-
+    
+    for(let key in marcelineSpritesMetaData) {
+        manager.add(key, marcelineSpritesMetaData[key].path);
+    }
     // Hp bar assets
-    manager.add('hp_bar', 'ui/hp_bar.png');
+    manager.add('hp_bar', 'assets/ui/hp_bar.png');
 
     // Background assets
-    manager.add('sky', 'background/sky.png');
-    manager.add('mountains', 'background/mountains.png');
-    manager.add('trees', 'background/trees.png');
-    manager.add('grass', 'background/grass.png');
-    manager.add('ground', 'background/ground.png');
+    manager.add('sky', 'assets/background/sky.png');
+    manager.add('mountains', 'assets/background/mountains.png');
+    manager.add('trees', 'assets/background/trees.png');
+    manager.add('grass', 'assets/background/grass.png');
+    manager.add('ground', 'assets/background/ground.png');
     return manager;
 };
 

@@ -1,4 +1,4 @@
-class animation
+class Animation
 {
     constructor(sprite_name, frameW, frameH, frameCount, hitboxes = [], repeated = true, offsetX = 0, offsetY = 0)
     {
@@ -59,74 +59,16 @@ class animation
     }
 }
 
-// function animation(_sprite_name, _frameW, _frameH, _frameCount, _repeated = true, _offsetX = 0, _offsetY = 0)
-// {
-//     let sprite_name = _sprite_name;
-//     let frameCount = _frameCount;
-//     let frameW = _frameW;
-//     let frameH = _frameH;
+function AnimationfromMetadata(animation_id, metadata)
+{
+    const data = metadata[animation_id];
+    return new Animation(
+        animation_id, 
+        data.frame_w,
+        data.frame_h,
+        data.frames,
+        data.hitboxes
+    );
+}
 
-//     let offsetX = _offsetX;
-//     let offsetY = _offsetY;
-
-//     let repeated = _repeated;
-//     let reversed = false;
-//     let paused = false;
-
-//     let currentFrame = 0;
-
-//     const update = function() {
-//         if (paused)
-//             return ;//(currentFrame === 0 && !reversed) || (currentFrame === frameCount - 1 && reversed);
-
-//         if (reversed)
-//             currentFrame = (currentFrame - 1 >= 0 ) ? currentFrame - 1 : (repeated ? frameCount - 1 : 0);
-//         else
-//             currentFrame = (currentFrame + 1 < frameCount) ? currentFrame + 1 : (repeated ? 0 : frameCount - 1);
-//     }
-
-//     const finished = function() {
-//         return (currentFrame === 0 && reversed) || (currentFrame === frameCount - 1 && !reversed);
-//     }
-
-//     const reset = function() {
-//         currentFrame = 0;
-//         reversed = false;
-//     }
-
-//     const reverse = function() {
-//         reversed = !reversed;
-//     }
-
-//     const pause = function() {
-//         paused = true;
-//     }
-
-//     const resume = function() {
-//         paused = false;
-//     }
-
-//     const getSpriteFrame = function() {
-//         return {
-//             sprite_name: sprite_name,
-//             x: currentFrame * frameW,
-//             y: 0,
-//             width: frameW,
-//             height: frameH,
-//             offsetX: offsetX,
-//             offsetY: offsetY
-//         };
-//     }
-
-//     return {
-//         update: update,
-//         reset: reset,
-//         reverse: reverse,
-//         pause: pause,
-//         resume: resume,
-//         finished: finished,
-//         getSpriteFrame: getSpriteFrame,
-//     };
-// }
-
-export { animation };
+export { Animation, AnimationfromMetadata };

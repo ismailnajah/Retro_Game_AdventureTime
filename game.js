@@ -1,6 +1,7 @@
 import { assetsManager } from "./assets.js";
 import { Player } from "./player.js";
 import { Background } from "./background.js";
+import { Marceline} from "./marceline.js";
 
 
 document.addEventListener('contextmenu', event => event.preventDefault());
@@ -69,23 +70,24 @@ let assets = assetsManager();
 let projectiles = [];
 
 console.log(canvas.width, canvas.height);
-const player = new Player(width / 2, height - 60);
+const player = new Player(width / 2, height - 60, width, height);
+const boss = new Marceline(width * 0.8, height - 70, width, height);
 
 let gameStarted = false;
-let update = startScreenUpdate;
-let draw = startScreenDraw;
-// let update = gameUpdate;
-// let draw = gameDraw;
+// let update = startScreenUpdate;
+// let draw = startScreenDraw;
+let update = gameUpdate;
+let draw = gameDraw;
 let background;
 
 async function startGame()
 {
     await assets.load();
     background = new Background(width, height, assets);
-    player.setState('walking');
+    // player.setState('walking');
     player.maxHeight = height * 0.3;
 
-    window.addEventListener('keydown', onStart);
+    // window.addEventListener('keydown', onStart);
     requestAnimationFrame(gameLoop);
 }
 
@@ -182,9 +184,10 @@ function endGame()
 
 function gameUpdate(deltaTime)
 {
-    updateProjectiles(deltaTime);
+    // updateProjectiles(deltaTime);
     checkCollisions();
     player.update(deltaTime);
+    boss.update(deltaTime);
 }
 
 function collidesWith(a, b)
@@ -249,6 +252,7 @@ function gameDraw()
     ctx.clearRect(0, 0, width, height);
     drawBackground();
     drawHpBar();
+    boss.draw(ctx, assets);
     player.draw(ctx, assets);
     drawProjectiles();
 }
