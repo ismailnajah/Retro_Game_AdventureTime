@@ -73,18 +73,18 @@ const player = new Player(width / 2, height - 60, width, height);
 const boss = new Marceline(width * 0.8, height - 60, width, height);
 
 let gameStarted = false;
-// let update = startScreenUpdate;
-// let draw = startScreenDraw;
-let update = gameUpdate;
-let draw = gameDraw;
+let update = startScreenUpdate;
+let draw = startScreenDraw;
+// let update = gameUpdate;
+// let draw = gameDraw;
 let background;
 
 async function startGame()
 {
     await assets.load();
     background = new Background(width, height, assets);
-    // player.setState('walking'); 
-    // window.addEventListener('keydown', onStart);
+    player.setState('walking'); 
+    window.addEventListener('keydown', onStart);
     requestAnimationFrame(gameLoop);
 }
 
