@@ -20,7 +20,7 @@ class Player
         this.speed = 10;
         this.jumpStrength = 25;
         this.maxHeight = screenHeight * 0.3;
-        this.damage = 20;
+        this.damage = 10;
 
         this.shouldCombo = false;
         this.hardHit = false;
@@ -48,6 +48,7 @@ class Player
         this.xVelocity = 0;
         this.yVelocity = 0;
         this.direction = 'right';
+        this.slowAnimation = false;
         this.setState('idle');
     }
 
@@ -62,6 +63,7 @@ class Player
         else 
             this.setState('hurt');
     }
+
     move(direction = null)
     {
         if (!direction)

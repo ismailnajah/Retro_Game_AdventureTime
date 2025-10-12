@@ -51,7 +51,7 @@ class Marceline
 
     setIdleTimer()
     {
-        const duration = 200;
+        const duration = 30;
         this.idleTimer = Math.floor(Math.random() * duration) + duration;
     }
     

@@ -26,10 +26,13 @@ const idleState = (marceline) => {
             marceline.setIdleTimer();
             const hpLost = marceline.maxHp - marceline.hp;
             if (marceline.hp <= marceline.maxHp / 2 && marceline.isHuman)
+            {
                 marceline.setState('monsterTransform');
+                return;
+            }
             if (marceline.isHuman)
             {
-                if (Math.random() < 0.025 || (hpLost > 0 && hpLost % 30 === 0))
+                if (Math.random() < 0.025 || (hpLost > 0 && hpLost % 20 === 0))
                     marceline.setState('guitarOut');
                 else
                     marceline.setState('spawnBats');
@@ -171,7 +174,7 @@ const spawnBatsState = (marceline) => {
             const currentFrame = marceline.animations[marceline.animation_id].currentFrame;
             const offset = 100;
             if (currentFrame === 11) {
-                for (let i = 1; i < 2; i++)
+                for (let i = 1; i < 3; i++)
                 {
                     let x = Math.random() < 0.5 ? 0 : marceline.screenWidth;
                     x += (x === 0) ? -offset * i : offset * i;
@@ -218,7 +221,7 @@ const monsterRangeAttackState = (marceline) => {
         enter: () => {
             marceline.setAnimationId('monsterBat_range_attack');
             marceline.isAttacking = true;
-            timer = 30; // Duration of the attack
+            timer = 20; // Duration of the attack
         },
         update: () => {
             const finished = marceline.animations[marceline.animation_id].finished();
