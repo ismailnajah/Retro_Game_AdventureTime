@@ -1,22 +1,46 @@
 import { Projectile } from './projectile.js';
 
 const idleState = (marceline) => {
+    let timer = 0;
     return {
         enter: () => {
-            marceline.setAnimationId(marceline.isCalm ? 'idle' : 'idleFlying');
+            if (marceline.isHuman)
+                marceline.setAnimationId(marceline.isCalm ? 'idle' : 'idleFlying');
+            else
+            {
+                marceline.y = marceline.groundY - 20;
+                marceline.setAnimationId('monsterIdle');
+            }
             if (marceline.isCalm)
                 marceline.y = marceline.groundY;
             marceline.isAttacking = false;
             marceline.immune = false;
         },
         update: () => {
-            if (!marceline.isCalm)
-            marceline.y = marceline.groundY - 10 + Math.sin(Date.now() / 150) * 5;
+            if (!marceline.isCalm && marceline.animation_id === 'idleFlying')
+                marceline.y = marceline.groundY - 10 + Math.sin(Date.now() / 150) * 5;
             if (marceline.isCalm) return;
-            if (marceline.hp <= marceline.maxHp / 2)
+
+            marceline.idleTimer -= 1;
+            if (marceline.idleTimer > 0) return;
+            marceline.setIdleTimer();
+            const hpLost = marceline.maxHp - marceline.hp;
+            if (marceline.hp <= marceline.maxHp / 2 && marceline.isHuman)
                 marceline.setState('monsterTransform');
-            else if (Math.random() < 0.05)
-                marceline.setState('guitarOut');
+            if (marceline.isHuman)
+            {
+                if (Math.random() < 0.025 || (hpLost > 0 && hpLost % 30 === 0))
+                    marceline.setState('guitarOut');
+                else
+                    marceline.setState('spawnBats');
+            }
+            else
+            {
+                if (marceline.player_distance !== undefined && marceline.player_distance > 100)
+                    marceline.setState('monsterRangeAttack');
+                else if (Math.random() < 0.8)
+                    marceline.setState('monsterMeleeAttack');
+            }
         },
     }
 }
@@ -121,6 +145,7 @@ const guitarInState = (marceline) => {
 const hurtState = (marceline) => {
     return {
         enter: () => {
+            marceline.idleTimer = 0;
             marceline.immuneTimer = 30;
             marceline.immune = true;
             marceline.setAnimationId(marceline.isHuman ? 'marceline_hurt' : 'monsterHurt');
@@ -128,27 +153,44 @@ const hurtState = (marceline) => {
         
         update: () => {
             const finished = marceline.animations[marceline.animation_id].finished();
-            if (finished) {
-                marceline.setState(marceline.isHuman ? 'idle' : 'monsterIdle');
-            }
+            if (finished)
+                marceline.setState('idle');
         },
     }
 }
 
-const monsterIdleState = (marceline) => {
+const spawnBatsState = (marceline) => {
     return {
         enter: () => {
-            marceline.setAnimationId('monsterIdle');
-            marceline.isAttacking = false;
-            marceline.isHuman = false;
-            marceline.immune = false;
+            marceline.y = marceline.groundY;
+            marceline.setAnimationId('flying_bats_attack');
+            marceline.isAttacking = true;
         },
         update: () => {
-
-            if (marceline.player_distance > 100 && Math.random() < 0.015)
-                marceline.setState('monsterRangeAttack');
-            else if (marceline.player_distance <= 100 && Math.random() < 0.3)
-                marceline.setState('monsterMeleeAttack');
+            const finished = marceline.animations[marceline.animation_id].finished();
+            const currentFrame = marceline.animations[marceline.animation_id].currentFrame;
+            const offset = 100;
+            if (currentFrame === 11) {
+                for (let i = 1; i < 2; i++)
+                {
+                    let x = Math.random() < 0.5 ? 0 : marceline.screenWidth;
+                    x += (x === 0) ? -offset * i : offset * i;
+                    const direction = x <= 0 ? 'right' : 'left';
+                    marceline.projectiles.push(
+                        new Projectile( 
+                            x, 
+                            marceline.y,
+                            direction,
+                            4,
+                            'bat_flying',
+                            'bat_flying'
+                        )
+                    );
+                }
+            }
+            if (finished) {
+                marceline.setState('idle');
+            }
         },
     }
 }
@@ -164,7 +206,7 @@ const monsterTransformState = (marceline) => {
         update: () => {
             const finished = marceline.animations[marceline.animation_id].finished();
             if (finished) {
-                marceline.setState('monsterIdle');
+                marceline.setState('idle');
             }
         },
     }
@@ -195,9 +237,8 @@ const monsterRangeAttackState = (marceline) => {
                 );
             }
             timer -= 1;
-            if (finished && timer <= 0) {
-                marceline.setState('monsterIdle');
-            }
+            if (finished && timer <= 0)
+                marceline.setState('idle');
         },
     }
 }
@@ -213,7 +254,7 @@ const monsterMeleeAttackState = (marceline) => {
             const currentFrame = marceline.animations[marceline.animation_id].currentFrame;
             marceline.isAttacking = currentFrame > 4 && currentFrame < 7;
             if (finished)
-                marceline.setState('monsterIdle');
+                marceline.setState('idle');
         }
     }
 }
@@ -246,9 +287,9 @@ export function setStates(marceline)
         'guitarAttack': guitarAttackState(marceline),
         'startTeleport': startTeleportState(marceline),
         'endTeleport': endTeleportState(marceline),
+        'spawnBats': spawnBatsState(marceline),
         'guitarIn': guitarInState(marceline),
         'hurt': hurtState(marceline),
-        'monsterIdle': monsterIdleState(marceline),
         'monsterRangeAttack': monsterRangeAttackState(marceline),
         'monsterMeleeAttack': monsterMeleeAttackState(marceline),
         'monsterTransform': monsterTransformState(marceline),

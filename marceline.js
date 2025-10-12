@@ -31,6 +31,7 @@ class Marceline
         this.invisible = false;
         this.immune = false;
         this.immuneTimer = 0;
+        this.idleTimer = 0;
         
         this.state = 'idle';
         this.states = setStates(this);
@@ -48,6 +49,25 @@ class Marceline
         }
     }
 
+    setIdleTimer()
+    {
+        const duration = 200;
+        this.idleTimer = Math.floor(Math.random() * duration) + duration;
+    }
+    
+    reset()
+    {
+        this.hp = this.maxHp;
+        this.isDead = false;
+        this.isCalm = false;
+        this.isHuman = true;
+        this.invisible = false;
+        this.immune = false;
+        this.immuneTimer = 0;
+        this.projectiles = [];
+        this.setState('idle');
+    }
+
     update(deltaTime, player)
     {
         if (this.immuneTimer > 0)
@@ -62,8 +82,9 @@ class Marceline
         }
         this.projectiles.forEach(p => p.update());
         this.projectiles = this.projectiles.filter(
-            p => (!p.isExploded && p.x > -50 && p.x < this.screenWidth + 50)
+            p => (!p.isExploded && p.x > -this.screenWidth && p.x < 2 * this.screenWidth)
         );
+        this.projectiles.forEach(p => p.hitPlayer(player));
         this.player_distance = distance(this, player);
         if (this.state === "guitarAttack" && this.player_distance < 80)
         {
@@ -82,20 +103,11 @@ class Marceline
         if (this.invisible || this.isCalm)
             return false;
         const player_hitbox = player.getHitbox();
-        for (const p of this.projectiles)
-        {
-            if (p.isExploded || p.state != 'moving')
-                continue;
-            if (boxesIntersect(player_hitbox, p.getHitbox()))
-            {
-                p.exploade();
-                player.hardHit = true;
-                return true;
-            }
-            
-        }
         const player_intersect = boxesIntersect(player_hitbox, this.getHitbox());
-        if (player_intersect && player.isAttacking && !this.isAttacking && !this.immune && this.immuneTimer <= 0)
+        if (player_intersect && player.isAttacking 
+            && !this.isAttacking 
+            && !this.immune
+            && this.immuneTimer <= 0)
         {
             this.setState('hurt');
             this.hp -= player.damage;

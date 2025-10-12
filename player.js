@@ -34,8 +34,23 @@ class Player
 
         this.animation_id = 'idle1';
         this.animations = setAnimations();
+        this.slowAnimation = false;
     }
-    
+    reset()
+    {
+        this.hp = this.maxHp;
+        this.isDead = false;
+        this.hurtTimer = 0;
+        this.shieldUp = false;
+        this.isAttacking = false;
+        this.shouldCombo = false;
+        this.hardHit = false;
+        this.xVelocity = 0;
+        this.yVelocity = 0;
+        this.direction = 'right';
+        this.setState('idle');
+    }
+
     hurt(damage, direction)
     {
         if (this.hurtTimer > 0 || this.isDead || this.shieldUp || this.isAttacking)
@@ -112,6 +127,7 @@ class Player
     {
         if (this.hp <= 0)
             this.setState(this.y !== this.groundY ? 'falling': 'die');
+        if (this.slowAnimation && Math.floor(Date.now() / 50) % 2 == 0) return;
         this.states[this.state].update();
         this.animations[this.animation_id].update();
     }

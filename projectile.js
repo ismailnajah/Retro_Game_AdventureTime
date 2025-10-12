@@ -1,5 +1,6 @@
 import { AnimationfromMetadata } from "./animation.js";
 import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
+import { boxesIntersect } from "./utils.js";
 
 class Projectile {
     constructor(x, y, direction, speed, movingAnimationId, explosionAnimationId) {
@@ -7,13 +8,9 @@ class Projectile {
         this.y = y;
         this.direction = direction;
         this.speed = speed;
-
         this.movingAnimation = AnimationfromMetadata(movingAnimationId, marcelineSpritesMetadata);
         this.explosionAnimation = AnimationfromMetadata(explosionAnimationId, marcelineSpritesMetadata);
-
-        
         this.state = 'moving';
-
         this.isExploded = false;
     }
 
@@ -29,6 +26,17 @@ class Projectile {
             if (this.explosionAnimation.finished()) {
                 this.isExploded = true;
             }
+        }
+    }
+
+    hitPlayer(player) {
+        if (this.isExploded || this.state !== 'moving') return;
+        const hitbox = this.getHitbox();
+        const playerHitbox = player.getHitbox();
+        if (boxesIntersect(hitbox, playerHitbox)) {
+            player.hardHit = true;
+            player.hurt(1, this.x < player.x ? 'right' : 'left');
+            this.exploade();
         }
     }
 

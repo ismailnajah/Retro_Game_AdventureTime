@@ -689,6 +689,7 @@ const victoryState = (_player) => {
     {
         player.stop();
         player.setAnimationId(Math.random() < 0.5 ? 'win1' : 'win2');
+        player.slowAnimation = true;
     }
 
     function update()

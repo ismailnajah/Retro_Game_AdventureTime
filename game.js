@@ -3,7 +3,6 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 import { Marceline} from "./marceline.js";
 
-
 document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
@@ -38,8 +37,10 @@ function setupControl(button, key)
 
 const redButton = document.getElementById('redCircle');
 const blueButton = document.getElementById('blueButton');
+
 setupControl(redButton, 'Space');
 setupControl(blueButton, 'KeyG');
+
 
 const keys = {
     'upArrow': 'ArrowUp',
@@ -51,8 +52,6 @@ for (let arrow of document.getElementsByClassName('arrow'))
 {
     setupControl(arrow, keys[arrow.id]);
 }
-
-
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -67,24 +66,19 @@ let lastTime = performance.now();
 
 let assets = assetsManager();
 
-let projectiles = [];
-
 const player = new Player(width / 2, height - 60, width, height);
 const boss = new Marceline(width * 0.8, height - 60, width, height);
 
 let gameStarted = false;
 let update = startScreenUpdate;
 let draw = startScreenDraw;
-// let update = gameUpdate;
-// let draw = gameDraw;
 let background;
 
 async function startGame()
 {
     await assets.load();
     background = new Background(width, height, assets);
-    player.setState('walking'); 
-    window.addEventListener('keydown', onStart);
+    restartGame();
     requestAnimationFrame(gameLoop);
 }
 
@@ -151,23 +145,45 @@ function transitionDraw()
     player.draw(ctx, assets);
 }
 
+function restartGame()
+{
+    if (gameStarted) return;
+    player.x = width / 2;
+    player.y = height - 60;
+    player.reset();
+    player.setState('walking');
+
+    boss.x = width * 0.8;
+    boss.y = height - 60;
+    boss.reset();
+
+    gameStarted = false;
+    shouldStop = false;
+    update = startScreenUpdate;
+    draw = startScreenDraw;
+
+    window.addEventListener('keydown', onStart);
+}
+
+const greenButton = document.getElementById('greenCircle');
+greenButton.addEventListener('click', restartGame);
+
 function gameLoop(timestamp)
 {
     let delta = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
     accumulator += delta;
 
-    if (player.isDead)
-    {
-        endGame();
-        return;
-    }
-
-    while (accumulator >= FIXED_DT) {
-        update(FIXED_DT);
-        accumulator -= FIXED_DT;
+    if (!player.isDead)
+    { 
+        while (accumulator >= FIXED_DT) {
+            update(FIXED_DT);
+            accumulator -= FIXED_DT;
+        }
     }
     draw();
+    if (player.isDead)
+        endGame();
     requestAnimationFrame(gameLoop);
 }
 
@@ -176,9 +192,10 @@ function endGame()
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = 'white';
-    ctx.font = '48px serif';
     ctx.textAlign = 'center';
+    ctx.font = `${width * 0.2}px "Jersey 10", sans-serif`;
     ctx.fillText('Game Over', width / 2, height / 2);
+    gameStarted = false;
 }
 
 function victoryMessage()
@@ -189,6 +206,7 @@ function victoryMessage()
     ctx.fillText('You Win!', width / 2, height / 2);
     ctx.font = `${width * 0.07}px "Jersey 10", sans-serif`;
     ctx.fillText('Marceline is calm again.', width / 2, height / 2 + 30);
+    gameStarted = false;
 }
 
 function gameUpdate(deltaTime)
