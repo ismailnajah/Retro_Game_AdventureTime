@@ -2,7 +2,6 @@ import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { setStates } from "./marcelineState.js";
 import { boxesIntersect, distance } from "./utils.js";
-import { shieldInState } from "./playerState.js";
 
 class Marceline
 {
@@ -23,10 +22,13 @@ class Marceline
         this.yVelocity = 0;
         this.maxHeight = 50;
         this.newX = x;
+        this.player_distance = undefined;
 
         this.isAttacking = false;
+        this.isCalm = false;
         
         this.isHuman = true;
+        this.invisible = false;
         this.immune = false;
         this.immuneTimer = 0;
         
@@ -51,9 +53,9 @@ class Marceline
         if (this.immuneTimer > 0)
             this.immuneTimer--;
         if (this.hitPlayer(player))
-            player.hurt(1);
+            player.hurt(1, this.x < player.x ? 'right' : 'left');
 
-        if (Math.floor(Date.now() / 50) % 2 == 0)
+        if (true && Math.floor(Date.now() / 50) % 2 == 0)
         {
             this.states[this.state].update();
             this.animations[this.animation_id].update();
@@ -62,9 +64,14 @@ class Marceline
         this.projectiles = this.projectiles.filter(
             p => (!p.isExploded && p.x > -50 && p.x < this.screenWidth + 50)
         );
-        if (this.state === "guitarAttack" && distance(this, player) < 80)
+        this.player_distance = distance(this, player);
+        if (this.state === "guitarAttack" && this.player_distance < 80)
         {
             this.newX = player.x + (this.x < player.x ? 150 : -150);
+            if (this.newX < 50)
+                this.newX = 50;
+            if (this.newX > this.screenWidth - 50)
+                this.newX = this.screenWidth - 50;
             this.setState("startTeleport");
         }
         this.direction = player.x > this.x ? 'right' : 'left';
@@ -72,6 +79,8 @@ class Marceline
 
     hitPlayer(player)
     {
+        if (this.invisible || this.isCalm)
+            return false;
         const player_hitbox = player.getHitbox();
         for (const p of this.projectiles)
         {
@@ -85,17 +94,21 @@ class Marceline
             }
             
         }
-        const player_acttack = boxesIntersect(player_hitbox, this.getHitbox()) && player.isAttacking;     
-        if (player_acttack && !this.isAttacking && !this.immune && this.immuneTimer <= 0)
+        const player_intersect = boxesIntersect(player_hitbox, this.getHitbox());
+        if (player_intersect && player.isAttacking && !this.isAttacking && !this.immune && this.immuneTimer <= 0)
         {
             this.setState('hurt');
             this.hp -= player.damage;
+            if (this.hp <= 0)
+            {
+                this.hp = 0;
+                this.setState('calmDown');
+            }
             return false;
         }
         if (!this.isAttacking)
             return false;
-
-
+        return player_intersect;
     }
 
     setAnimationId(id)
@@ -130,7 +143,7 @@ class Marceline
     draw(ctx, assets)
     {
         let shouldDraw = true; 
-        if (this.immuneTimer - 20 > 0 && Math.floor(this.immuneTimer) % 2 == 0)
+        if (this.immuneTimer > 0 && Math.floor(this.immuneTimer) % 2 == 0)
                 shouldDraw = false;
         
         if (shouldDraw)
@@ -147,8 +160,28 @@ class Marceline
             frame.width, frame.height);
             ctx.restore();
         }
+        // ctx.strokeStyle = 'red';
+        // const hitbox = this.getHitbox();
+        // ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
         this.projectiles.forEach(p => p.draw(ctx, assets));
-    } 
+    }
+    
+    drawHpBar(ctx)
+    {
+        if (this.invisible  || this.isCalm)
+            return;
+        const hitbox = this.getHitbox();
+        const barWidth = 80;
+        const barHeight = 5;
+        const x = this.x - barWidth / 2;
+        const y = this.y - hitbox.height / 2 - 20;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2);
+        ctx.fillStyle = 'red';
+        ctx.fillRect(x, y, barWidth, barHeight);
+        ctx.fillStyle = 'green';
+        ctx.fillRect(x, y, barWidth * (this.hp / this.maxHp), barHeight);
+    }
 }
 
 function setAnimations()

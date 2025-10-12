@@ -46,6 +46,7 @@ class Animation
     reverse()
     {
         this.reversed = !this.reversed;
+        this.currentFrame = this.frameCount - 1;
     }
 
     pause()

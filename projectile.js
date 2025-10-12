@@ -2,11 +2,11 @@ import { AnimationfromMetadata } from "./animation.js";
 import { marcelineSpritesMetadata } from "./marcelineSpritesMetadata.js";
 
 class Projectile {
-    constructor(x, y, direction, movingAnimationId, explosionAnimationId) {
+    constructor(x, y, direction, speed, movingAnimationId, explosionAnimationId) {
         this.x = x;
         this.y = y;
         this.direction = direction;
-        this.speed = 5;
+        this.speed = speed;
 
         this.movingAnimation = AnimationfromMetadata(movingAnimationId, marcelineSpritesMetadata);
         this.explosionAnimation = AnimationfromMetadata(explosionAnimationId, marcelineSpritesMetadata);

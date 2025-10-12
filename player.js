@@ -19,7 +19,7 @@ class Player
         
         this.speed = 10;
         this.jumpStrength = 25;
-        this.maxHeight = 150;
+        this.maxHeight = screenHeight * 0.3;
         this.damage = 20;
 
         this.shouldCombo = false;
@@ -36,10 +36,11 @@ class Player
         this.animations = setAnimations();
     }
     
-    hurt(damage)
+    hurt(damage, direction)
     {
         if (this.hurtTimer > 0 || this.isDead || this.shieldUp || this.isAttacking)
             return;
+        this.damage_direction = direction;
         this.hp -= damage;
         if (this.hp <= 0)
             this.setState('die');
@@ -50,8 +51,7 @@ class Player
     {
         if (!direction)
             direction = this.direction;
-        this.direction = direction;
-        this.x += this.direction === 'right' ? this.xVelocity : -this.xVelocity;
+        this.x += direction === 'right' ? this.xVelocity : -this.xVelocity;
         if (this.x < 0)
             this.x = 0;
         const hitbox = this.getHitbox();
@@ -97,16 +97,15 @@ class Player
         ctx.translate(this.x, this.y);
         if (this.direction == 'left')
             ctx.scale(-1, 1);
-        // ctx.drawImage(assets.get(frame.sprite_name), this.x, this.y);
         ctx.drawImage(assets.get(frame.sprite_name),
                 frame.x, frame.y, frame.width, frame.height, 
                 -frame.width / 2 + frame.offsetX,
                 -frame.height / 2 + frame.offsetY,
                 frame.width, frame.height);
         ctx.restore();
-        ctx.strokeStyle = 'red';
-        const hitbox = this.getHitbox();
-        ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        // ctx.strokeStyle = 'red';
+        // const hitbox = this.getHitbox();
+        // ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
     }
 
     update (deltatime)
@@ -159,6 +158,7 @@ function setStates(player)
     states['swordAttack'] = playerState.swordAttackState(player);
     states['swordIn'] = playerState.swordInState(player);
     states['die'] = playerState.dieState(player);
+    states['victory'] = playerState.victoryState(player);
     return states;
 }
 

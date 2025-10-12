@@ -1,5 +1,4 @@
-const idleState = (_player) => {
-    const player = _player;
+const idleState = (player) => {
     function enter()
     {
         player.stop();
@@ -73,9 +72,8 @@ const walkingState = (_player) => {
     };
 }
 
-const jakeRollInState = (_player) => {
+const jakeRollInState = (player) => {
     //this state only for the transition animation
-    const player = _player;
 
     function enter()
     {
@@ -104,9 +102,8 @@ const jakeRollInState = (_player) => {
     };
 }
 
-const jakeRollState = (_player) => {
+const jakeRollState = (player) => {
     //this state only for the transition animation
-    const player = _player;
 
     function enter()
     {
@@ -125,9 +122,8 @@ const jakeRollState = (_player) => {
     };
 }
 
-const jakeRollOutState = (_player) => {
+const jakeRollOutState = (player) => {
     //this state only for the transition animation
-    const player = _player;
 
     function enter()
     {
@@ -154,9 +150,7 @@ const jakeRollOutState = (_player) => {
     };
 }
 
-const runningState = (_player) => {
-    const player = _player;
-
+const runningState = (player) => {
     function enter()
     {
         player.xVelocity = player.speed;
@@ -212,9 +206,7 @@ const runningState = (_player) => {
     };
 }
 
-const jumpingState = (_player) => {
-    const player = _player;
-
+const jumpingState = (player) => {
     function enter()
     {
         player.yVelocity = -player.jumpStrength;
@@ -245,7 +237,7 @@ const jumpingState = (_player) => {
     {
         if (input !== 'ArrowRight' && input !== 'ArrowLeft')
             return ;
-        player.move(input == 'ArrowRight' ? 'right' : 'left');
+        player.direction = input === 'ArrowRight' ? 'right' : 'left';
     }
 
     return {
@@ -256,8 +248,7 @@ const jumpingState = (_player) => {
     };
 }
 
-const fallingState = (_player) => {
-    const player = _player;
+const fallingState = (player) => {
     let gravity = 3;
 
     function enter()
@@ -302,8 +293,7 @@ const fallingState = (_player) => {
     };
 }
 
-const landingState = (_player) => {
-    const player = _player;
+const landingState = (player) => {
     
     function enter()
     {
@@ -338,8 +328,7 @@ const landingState = (_player) => {
     };
 }
 
-const duckingState = (_player) => {
-    const player = _player;
+const duckingState = (player) => {
     let standing = false;
 
     function enter()
@@ -382,9 +371,7 @@ const duckingState = (_player) => {
     };
 }
 
-const shieldOutState = (_player) => {
-    const player = _player;
-    
+const shieldOutState = (player) => {
     function enter()
     {
         player.shieldUp = true;
@@ -430,8 +417,7 @@ const shieldOutState = (_player) => {
     };
 }
 
-const shieldWalkState = (_player) => {
-    const player = _player;
+const shieldWalkState = (player) => {
     const speedModifier = 0.5;
 
     function enter()
@@ -473,8 +459,7 @@ const shieldWalkState = (_player) => {
     };
 }
 
-const shieldInState = (_player) => {
-    const player = _player;
+const shieldInState = (player) => {
 
     function enter()
     {
@@ -512,8 +497,7 @@ const shieldInState = (_player) => {
     };
 }
 
-const dieState = (_player) => {
-    const player = _player;
+const dieState = (player) => {
 
     function enter()
     {
@@ -540,8 +524,7 @@ const dieState = (_player) => {
     };
 }      
 
-const hurtState = (_player) => {
-    const player = _player;
+const hurtState = (player) => {
     const gravity = 2;
     
     function enter()
@@ -549,6 +532,7 @@ const hurtState = (_player) => {
         player.stop();
         player.hurtTimer = 1.0;
         player.setAnimationId(player.hardHit ? 'hard_hit' : 'hurt');
+        player.xVelocity = player.hardHit ? 4 : 2;
     }
 
     function update()
@@ -560,8 +544,9 @@ const hurtState = (_player) => {
         {
             player.y = player.groundY;
             player.yVelocity = 0;
-        }
-        
+        } 
+        player.move(player.damage_direction);
+        player.direction = player.damage_direction === 'right' ? 'left' : 'right';
         const finished = player.animations[player.animation_id].finished();
         if (finished && player.y == player.groundY)
         {
@@ -697,6 +682,32 @@ const swordInState = (_player) => {
     };
 }
 
+const victoryState = (_player) => {
+    const player = _player;
+
+    function enter()
+    {
+        player.stop();
+        player.setAnimationId(Math.random() < 0.5 ? 'win1' : 'win2');
+    }
+
+    function update()
+    {}
+
+    function onKeyUp(input)
+    {}
+
+    function onKeyDown(input)
+    {}
+
+    return {
+        enter: enter,
+        update: update,
+        onKeyDown: onKeyDown,
+        onKeyUp: onKeyUp,
+    };
+}
+
 
 export { idleState,
          walkingState,
@@ -716,4 +727,5 @@ export { idleState,
          swordInState,
          hurtState,
          dieState,
+         victoryState,
         };

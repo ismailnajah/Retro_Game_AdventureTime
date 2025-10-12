@@ -83,9 +83,7 @@ async function startGame()
 {
     await assets.load();
     background = new Background(width, height, assets);
-    // player.setState('walking');
-    player.maxHeight = height * 0.3;
-
+    // player.setState('walking'); 
     // window.addEventListener('keydown', onStart);
     requestAnimationFrame(gameLoop);
 }
@@ -164,6 +162,7 @@ function gameLoop(timestamp)
         endGame();
         return;
     }
+
     while (accumulator >= FIXED_DT) {
         update(FIXED_DT);
         accumulator -= FIXED_DT;
@@ -182,8 +181,20 @@ function endGame()
     ctx.fillText('Game Over', width / 2, height / 2);
 }
 
+function victoryMessage()
+{
+    ctx.fillStyle = '#181818';
+    ctx.textAlign = 'center';
+    ctx.font = `${width * 0.2}px "Jersey 10", sans-serif`;
+    ctx.fillText('You Win!', width / 2, height / 2);
+    ctx.font = `${width * 0.07}px "Jersey 10", sans-serif`;
+    ctx.fillText('Marceline is calm again.', width / 2, height / 2 + 30);
+}
+
 function gameUpdate(deltaTime)
 {
+    if (boss.isCalm)
+        player.setState('victory');
     player.update(deltaTime);
     boss.update(deltaTime, player);
 }
@@ -193,8 +204,19 @@ function gameDraw()
     ctx.clearRect(0, 0, width, height);
     drawBackground();
     drawHpBar();
-    boss.draw(ctx, assets);
-    player.draw(ctx, assets);
+    boss.drawHpBar(ctx);
+    if (boss.isAttacking)
+    {
+        player.draw(ctx, assets);
+        boss.draw(ctx, assets);
+    }
+    else
+    {
+        boss.draw(ctx, assets);
+        player.draw(ctx, assets);
+    }
+    if (boss.isCalm)
+        victoryMessage();
 }
 
 function drawBackground(moveBackground = false)
