@@ -7,41 +7,37 @@ document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
-        button.classList.remove('button');
-        button.classList.add('buttonPressed');
+        button.classList.toggle('button-clicked');
+        console.log('touchstart');
         if (!gameStarted)
             onStart();
         player.states[player.state].onKeyDown(key);
     });
 
     button.addEventListener('touchend', (e) => {
-        button.classList.remove('buttonPressed');
-        button.classList.add('button');
+        button.classList.toggle('button-clicked');
+        clearInterval(interval);
         player.states[player.state].onKeyUp(key);
     });
 
     button.addEventListener('mousedown', (e) => {
-        button.classList.remove('button');
-        button.classList.add('buttonPressed');
+        button.classList.toggle('button-clicked');
         if (!gameStarted)
             onStart();
         player.states[player.state].onKeyDown(key);
     });
 
     button.addEventListener('mouseup', (e) => {
-        button.classList.remove('buttonPressed');
-        button.classList.add('button');
+        button.classList.toggle('button-clicked');
         player.states[player.state].onKeyUp(key);
     });
 }
 
 function endClick()
 {
-    for (let button of document.getElementsByClassName('buttonPressed'))
-    {
-        button.classList.remove('buttonPressed');
-        button.classList.add('button');
-    }
+    for(let button of document.getElementsByClassName('button-clicked'))
+        button.classList.toggle('button-clicked');
+    
     player.states[player.state].onKeyUp('Space');
     player.states[player.state].onKeyUp('KeyG');
     player.states[player.state].onKeyUp('ArrowUp');
@@ -49,7 +45,6 @@ function endClick()
     player.states[player.state].onKeyUp('ArrowLeft');
     player.states[player.state].onKeyUp('ArrowRight');
 }
-
 
 document.addEventListener('touchend', endClick);
 document.addEventListener('mouseup', endClick);
@@ -187,7 +182,17 @@ function restartGame()
 }
 
 const greenButton = document.getElementById('greenCircle');
-greenButton.addEventListener('click', restartGame);
+greenButton.addEventListener('touchstart', (e) => {
+    greenButton.classList.toggle('button-clicked');
+    restartGame();
+});
+greenButton.addEventListener('mousedown', (e) => {
+    greenButton.classList.toggle('button-clicked');
+    restartGame();
+});
+greenButton.addEventListener('touchend', (e) => greenButton.classList.toggle('button-clicked'));
+greenButton.addEventListener('mouseup', (e) => greenButton.classList.toggle('button-clicked'));
+
 
 function gameLoop(timestamp)
 {
