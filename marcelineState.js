@@ -163,6 +163,7 @@ const hurtState = (marceline) => {
 }
 
 const spawnBatsState = (marceline) => {
+    const batCount = 1;
     return {
         enter: () => {
             marceline.y = marceline.groundY;
@@ -174,10 +175,10 @@ const spawnBatsState = (marceline) => {
             const currentFrame = marceline.animations[marceline.animation_id].currentFrame;
             const offset = 100;
             if (currentFrame === 11) {
-                for (let i = 1; i < 3; i++)
+                for (let i = 0; i < batCount; i++)
                 {
                     let x = Math.random() < 0.5 ? 0 : marceline.screenWidth;
-                    x += (x === 0) ? -offset * i : offset * i;
+                    x += (x === 0) ? -( 100 + offset * i) : (100 + offset) * i;
                     const direction = x <= 0 ? 'right' : 'left';
                     marceline.projectiles.push(
                         new Projectile( 

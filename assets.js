@@ -50,6 +50,7 @@ let assetsManager = () => {
     manager.add('mountains', 'assets/background/mountains.png');
     manager.add('trees', 'assets/background/trees.png');
     manager.add('grass', 'assets/background/grass.png');
+    manager.add('billboard', 'assets/background/billboard.png');
     manager.add('ground', 'assets/background/ground.png');
     return manager;
 };

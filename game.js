@@ -8,7 +8,6 @@ function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
         button.classList.toggle('button-clicked');
-        console.log('touchstart');
         if (!gameStarted)
             onStart();
         player.states[player.state].onKeyDown(key);
@@ -37,7 +36,7 @@ function endClick()
 {
     for(let button of document.getElementsByClassName('button-clicked'))
         button.classList.toggle('button-clicked');
-    
+
     player.states[player.state].onKeyUp('Space');
     player.states[player.state].onKeyUp('KeyG');
     player.states[player.state].onKeyUp('ArrowUp');
@@ -82,6 +81,7 @@ let assets = assetsManager();
 
 const player = new Player(width / 2, height - 60, width, height);
 const boss = new Marceline(width * 0.8, height - 60, width, height);
+boss.setIdleTimer();
 
 let gameStarted = false;
 let update = startScreenUpdate;
@@ -105,7 +105,6 @@ function onStart(e)
     draw = transitionDraw;
 }
 
-
 function startScreenUpdate()
 {
     player.update();
@@ -126,8 +125,10 @@ function transitionUpdate()
 {
     if (player.x > width)
     {
-        player.x = -10;
-        shouldStop = true;
+        player.x = -50;
+        update = blackScreenUpdate;
+        draw = blackScreenDraw;
+        return;
     }
     if (shouldStop && player.x >= width * 0.2)
         player.setState('jakeRollOut');
@@ -145,13 +146,50 @@ function transitionUpdate()
         draw = gameDraw;
     }
 }
+let alpha = 0;
+let step = 0.05;
+const blackScreenUpdate = () => {
+    alpha += step;
+    if (alpha >= 1)
+    {
+        background.showTutorial = false;
+        step = -step;
+    }
+    if (step < 0)
+        boss.update(0, player);
+    if (alpha <= 0 && step < 0)
+        shouldStop = true;
+    if (!shouldStop) return ;
+
+    if (player.x > width * 0.2)
+        player.setState('jakeRollOut');
+
+    player.update();
+    if (player.state === 'idle')
+    {
+        window.addEventListener('keydown', function(e) {
+            player.states[player.state].onKeyDown(e.code);
+        });
+        window.addEventListener('keyup', function(e) {
+            player.states[player.state].onKeyUp(e.code);
+        });
+        update = gameUpdate;
+        draw = gameDraw;
+    }
+}
+const blackScreenDraw = () => {
+    drawBackground();
+    player.draw(ctx, assets);
+    if (step < 0)
+        boss.draw(ctx, assets);
+    ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+    ctx.fillRect(0, 0, width, height);
+}
 
 window.addEventListener('keydown', function(e) {
-    // console.log(`keydown ${e.code}`);
     player.states[player.state].onKeyDown(e.code);
 });
 window.addEventListener('keyup', function(e) {
-    console.log(e.code);
     player.states[player.state].onKeyUp(e.code);
 });
 
@@ -177,7 +215,8 @@ function restartGame()
     shouldStop = false;
     update = startScreenUpdate;
     draw = startScreenDraw;
-
+    
+    background.showTutorial = true;
     window.addEventListener('keydown', onStart);
 }
 

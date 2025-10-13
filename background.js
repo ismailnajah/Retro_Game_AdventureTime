@@ -41,6 +41,15 @@ class Background
             y: screenH - assets.get('ground').height + 10,
             speed: 1,
         }
+
+        this.tutorial = {
+            width: assets.get('billboard').width,
+            height: assets.get('billboard').height,
+            x: screenW,
+            y: screenH - assets.get('billboard').height,
+            speed: 0.6,
+        }
+        this.showTutorial = true;
     }
 
     update()
@@ -49,6 +58,7 @@ class Background
         this.mountains.x -= this.mountains.speed;
         this.trees.x -= this.trees.speed;
         this.grass.x -= this.grass.speed;
+        this.tutorial.x -= this.tutorial.speed;
         this.ground.x -= this.ground.speed;
 
         if (this.sky.x <= -this.sky.width / 3)
@@ -59,6 +69,8 @@ class Background
             this.trees.x = 0;
         if (this.grass.x <= -this.grass.width / 3)
             this.grass.x = 0;
+        if (this.tutorial.x <= -this.tutorial.width)
+            this.tutorial.x = this.width + 160;
         if (this.ground.x <= -this.ground.width / 3)
             this.ground.x = 0;
     }
@@ -69,6 +81,8 @@ class Background
         ctx.drawImage(assets.get('mountains'), this.mountains.x, this.mountains.y);
         ctx.drawImage(assets.get('trees'), this.trees.x, this.trees.y);
         ctx.drawImage(assets.get('grass'), this.grass.x, this.grass.y);
+        if (this.showTutorial)
+            ctx.drawImage(assets.get('billboard'), this.tutorial.x, this.tutorial.y);
         ctx.drawImage(assets.get('ground'), this.ground.x, this.ground.y);
     }
 }
