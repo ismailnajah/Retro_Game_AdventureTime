@@ -85,6 +85,17 @@ class Background
             ctx.drawImage(assets.get('billboard'), this.tutorial.x, this.tutorial.y);
         ctx.drawImage(assets.get('ground'), this.ground.x, this.ground.y);
     }
+
+    reset()
+    {
+        this.sky.x = 0;
+        this.mountains.x = 0;
+        this.trees.x = 0;
+        this.grass.x = 0;
+        this.ground.x = 0;
+        this.tutorial.x = this.width;
+        this.showTutorial = true;
+    }
 }
 
 export { Background };

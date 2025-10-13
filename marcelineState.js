@@ -32,16 +32,16 @@ const idleState = (marceline) => {
             }
             if (marceline.isHuman)
             {
-                if (Math.random() < 0.025 || (hpLost > 0 && hpLost % 20 === 0))
+                if (Math.random() < 0.4 && (hpLost > 0 && hpLost % 20 === 0))
                     marceline.setState('guitarOut');
                 else
                     marceline.setState('spawnBats');
             }
             else
             {
-                if (marceline.player_distance !== undefined && marceline.player_distance > 100)
+                if (Math.random() < 0.6 && marceline.player_distance > 100)
                     marceline.setState('monsterRangeAttack');
-                else if (Math.random() < 0.8)
+                else if (Math.random() < 0.9)
                     marceline.setState('monsterMeleeAttack');
             }
         },

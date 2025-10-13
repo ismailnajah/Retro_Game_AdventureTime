@@ -202,21 +202,25 @@ function transitionDraw()
 function restartGame()
 {
     if (gameStarted) return;
+    alpha = 0;
+    step = 0.05;
     player.x = width / 2;
     player.y = height - 60;
     player.reset();
+    player.hp = 1;
     player.setState('walking');
 
     boss.x = width * 0.8;
     boss.y = height - 60;
     boss.reset();
+    boss.setIdleTimer();
 
+    background.reset();
     gameStarted = false;
     shouldStop = false;
     update = startScreenUpdate;
     draw = startScreenDraw;
     
-    background.showTutorial = true;
     window.addEventListener('keydown', onStart);
 }
 
