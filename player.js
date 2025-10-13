@@ -1,4 +1,4 @@
-import * as playerState from "./playerState.js";
+import { setStates } from "./playerState.js";
 import { AnimationfromMetadata } from "./animation.js";
 import { fennSpritesMetadata } from "./fennSpritesMetadata.js";
 
@@ -153,31 +153,6 @@ class Player
             height: hitbox.height - offsetY * 2,
         };
     }
-}
-
-function setStates(player)
-{
-    const states = {};
-    states['idle']    = playerState.idleState(player);
-    states['walking'] = playerState.walkingState(player);
-    states['jakeRollIn'] = playerState.jakeRollInState(player);
-    states['jakeRoll'] = playerState.jakeRollState(player);
-    states['jakeRollOut'] = playerState.jakeRollOutState(player);
-    states['running'] = playerState.runningState(player);
-    states['jumping'] = playerState.jumpingState(player);
-    states['falling'] = playerState.fallingState(player);
-    states['landing'] = playerState.landingState(player);
-    states['ducking'] = playerState.duckingState(player);
-    states['shieldOut'] = playerState.shieldOutState(player);
-    states['shieldIn'] = playerState.shieldInState(player);
-    states['shieldWalk'] = playerState.shieldWalkState(player);
-    states['hurt'] = playerState.hurtState(player);
-    states['swordOut'] = playerState.swordOutState(player);
-    states['swordAttack'] = playerState.swordAttackState(player);
-    states['swordIn'] = playerState.swordInState(player);
-    states['die'] = playerState.dieState(player);
-    states['victory'] = playerState.victoryState(player);
-    return states;
 }
 
 function setAnimations()
