@@ -24,7 +24,7 @@ body {
   border: 1px solid #000;
   border-radius: 4%;
   aspect-ratio: 3 / 4;
-  background-color: #3db99cf6;
+  background-color: #27c6a1cc;
   width: min(98vw, 70vh);
   height: auto;
 
@@ -98,7 +98,7 @@ body {
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  /* background-color: green; */
+  /* background-color: gray; */
 }
 
 #movePad{
@@ -133,22 +133,25 @@ body {
   background-color: green;
   border-radius: 50%;
   margin-top: 20%;
+  margin-left: 30%;
 }
 
 #redCircle{
-  width: 40%;
+  width: 45%;
   grid-column: 1 / span 2;
   aspect-ratio: 1 / 1;
   background-color: red;
   border-radius: 50%;
   margin-bottom: 5%;
+  margin-left: 30%;
 }
 
 #blueButton{
   grid-column: 1 / span 1;
-  width: 70%;
+  width: 80%;
   aspect-ratio: 1 / 1;
-  margin-top: 20%;
+  margin-top: 10%;
+  margin-left: 50%
 }
 
 #dpad
@@ -189,7 +192,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  background-color: yellow;
+  background-color: rgb(228, 228, 19);
   transform: translate(-50%, -50%);
   border-radius: 10%;
   pointer-events: none;
@@ -212,38 +215,35 @@ body {
   width: 34%;
   transform: translate(-50%, -50%);
   aspect-ratio: 1 / 1;
-  background-color: yellow;
+  background-color: rgb(228, 228, 19);
   border: 2px solid #000;
   border-radius: 10%;
 }
 
 .arrow{
-  background-color: yellow;
+  background-color: rgb(228, 228, 19);
   aspect-ratio: 1 / 1;
   border-radius: 10%;
   width: 100%;
+  border: 2px solid #000;
   user-select: none;
 }
 
 #upArrow{
   grid-column: 2 / span 1;
-  border: 2px solid #000;
 }
 
 #leftArrow{
   grid-column: 1 / span 1;
-  border: 2px solid #000;
 }
 
 #downArrow{
   grid-column: 2 / span 1;
   grid-row: 3;
-  border: 2px solid #000;
 }
 
 #rightArrow{
   grid-column: 3 / span 1;
-  border: 2px solid #000;
 }
 
 #bottomDetails {
@@ -258,11 +258,10 @@ body {
 .port{
   width: 20%;
   height: 40%;
-  background-color: #0d271a;
-  border: 2px solid #000;
+  background-color: #000064;
+  border: 2px solid black;
   border-radius: 20%;
   margin-right: 10%;
   margin-bottom: 10%;
-  background-color: #000064;
 }
 
