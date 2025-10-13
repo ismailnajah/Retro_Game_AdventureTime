@@ -215,7 +215,6 @@ function restartGame()
     player.x = width / 2;
     player.y = height - 60;
     player.reset();
-    player.hp = 1;
     player.setState('walking');
 
     boss.x = width * 0.8;
