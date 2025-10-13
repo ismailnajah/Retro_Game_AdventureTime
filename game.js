@@ -7,11 +7,11 @@ document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
-    button.classList.remove('button');
-    button.classList.add('buttonPressed');
-    if (!gameStarted)
-        onStart();
-    player.states[player.state].onKeyDown(key);
+        button.classList.remove('button');
+        button.classList.add('buttonPressed');
+        if (!gameStarted)
+            onStart();
+        player.states[player.state].onKeyDown(key);
     });
 
     button.addEventListener('touchend', (e) => {
@@ -34,6 +34,25 @@ function setupControl(button, key)
         player.states[player.state].onKeyUp(key);
     });
 }
+
+function endClick()
+{
+    for (let button of document.getElementsByClassName('buttonPressed'))
+    {
+        button.classList.remove('buttonPressed');
+        button.classList.add('button');
+    }
+    player.states[player.state].onKeyUp('Space');
+    player.states[player.state].onKeyUp('KeyG');
+    player.states[player.state].onKeyUp('ArrowUp');
+    player.states[player.state].onKeyUp('ArrowDown');
+    player.states[player.state].onKeyUp('ArrowLeft');
+    player.states[player.state].onKeyUp('ArrowRight');
+}
+
+
+document.addEventListener('touchend', endClick);
+document.addEventListener('mouseup', endClick);
 
 const redButton = document.getElementById('redCircle');
 const blueButton = document.getElementById('blueButton');
@@ -133,9 +152,11 @@ function transitionUpdate()
 }
 
 window.addEventListener('keydown', function(e) {
+    // console.log(`keydown ${e.code}`);
     player.states[player.state].onKeyDown(e.code);
 });
 window.addEventListener('keyup', function(e) {
+    console.log(e.code);
     player.states[player.state].onKeyUp(e.code);
 });
 
@@ -222,6 +243,7 @@ function gameDraw()
     ctx.clearRect(0, 0, width, height);
     drawBackground();
     drawHpBar();
+    // player.draw(ctx, assets);
     boss.drawHpBar(ctx);
     if (boss.isAttacking)
     {

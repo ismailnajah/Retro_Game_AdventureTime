@@ -436,27 +436,29 @@ const hurtState = (player) => {
 
 const swordOutState = (player) => {
     return {
-        enter: () =>
-        {
+        enter: () => {
             player.setAnimationId('sword_out');
             player.shouldCombo = true;
         },
     
-        update: () =>
-        {
+        update: () => {
             const finished = player.animations[player.animation_id].finished();
             if (finished)
                 player.setState('swordAttack');
         },
     
-        onKeyUp: (input) =>{
+        onKeyUp: (input) => {
             if (input === 'Space')
                 player.shouldCombo = false;
+            if (input === 'ArrowRight' || input === 'ArrowLeft')
+                player.xVelocity = 0;
         },
-        onKeyDown: (input) =>{
+
+        onKeyDown: (input) => {
             if (input !== 'ArrowRight' && input !== 'ArrowLeft')
                 return ;
             player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.xVelocity = player.speed;
         },
     }
 }
@@ -471,8 +473,7 @@ const swordAttackState = (player) => {
             player.isAttacking = true;
         },
     
-        update: () =>
-        {
+        update: () => {
             const finished = player.animations[player.animation_id].finished();
             if (finished)
             {
@@ -487,10 +488,11 @@ const swordAttackState = (player) => {
             }
         },
     
-        onKeyUp: (input) =>
-        {
+        onKeyUp: (input) => {
             if (input === 'Space')
                 player.shouldCombo = false;
+            if (input === 'ArrowRight' || input === 'ArrowLeft')
+                player.xVelocity = 0;
         },
     
         onKeyDown: (input) =>
@@ -498,37 +500,41 @@ const swordAttackState = (player) => {
             if (input !== 'ArrowRight' && input !== 'ArrowLeft')
                 return ;
             player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.xVelocity = player.speed;
         },
     }
 }
 
 const swordInState = (player) => {
     return {
-        enter: () =>
-        {
+        enter: () => {
             player.setAnimationId('sword_out');
             player.animations[player.animation_id].reverse();
             player.isAttacking = false;
         },
         
-        update: () =>
-        {
+        update: () => {
             const finished = player.animations[player.animation_id].finished();
             if (finished)
-                player.setState('idle');
+                player.setState(player.xVelocity === 0 ? 'idle' : 'running');
         },
-        onKeyUp: (input) =>{},
-        onKeyDown: (input) =>{
+
+        onKeyUp: (input) => {
+            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+                return ;
+            player.xVelocity = 0;
+        },
+
+        onKeyDown: (input) => {
             if (input !== 'ArrowRight' && input !== 'ArrowLeft')
                 return ;
             player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.xVelocity = player.speed;
         },
     }
 }
 
-const victoryState = (_player) => {
-    const player = _player;
-
+const victoryState = (player) => {
     return {
         enter: () => {
             player.stop();

@@ -18,6 +18,7 @@ class Projectile {
         if (this.isExploded) return;
         if (this.state === 'moving') {
             this.x += this.direction === 'left' ? -this.speed : this.speed;
+            this.y += Math.sin(this.x / 20) * 2; // Example of slight vertical movement
             this.movingAnimation.update();
         }
         else

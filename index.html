@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
-    <meta name="viewport" content="user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 </head>
 <body> 
     <div id="bmoBody">
@@ -22,14 +22,18 @@
                 <div id="lightIndicator"></div>
             </div>
             <div id="controls">
-                <div id="movePad">
-                    <div id="upArrow" class="arrow button"></div>
-                    <div id="leftArrow" class="arrow button"></div>
-                    <div id="downArrow" class="arrow button"></div>
-                    <div id="rightArrow" class="arrow button"></div>
+                <div id="dpad">
+                    <div id="arrows">
+                        <div id="upArrow" class="arrow button"></div>
+                        <div id="leftArrow" class="arrow button"></div>
+                        <div id="downArrow" class="arrow button"></div>
+                        <div id="rightArrow" class="arrow button"></div>
+                    </div>
+                    <div id="centerSquare"></div>
+                    <div id="overlay"></div>
                 </div>
                 <div id="actionPad">
-                    <img id="blueButton" class="button" src="assets/ui/blueButton.svg" alt="blue button icon">
+                    <img id="blueButton" class="button" src="assets/ui/blueButton.svg" alt="blue button icon" draggable="false">
                     <div id="greenCircle" class="button"></div>
                     <div id="redCircle" class="button"></div>
                 </div>
@@ -40,6 +44,5 @@
             </div>
         </div>
     </div>
-    <!-- <canvas id="gameCanvas" width="800" height="600"></canvas> -->
 </body>
 </html>
