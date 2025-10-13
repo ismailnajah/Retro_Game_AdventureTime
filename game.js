@@ -10,12 +10,12 @@ function setupControl(button, key)
         button.classList.toggle('button-clicked');
         if (!gameStarted)
             onStart();
-        player.states[player.state].onKeyDown(key);
+        else
+            player.states[player.state].onKeyDown(key);
     });
 
     button.addEventListener('touchend', (e) => {
         button.classList.toggle('button-clicked');
-        clearInterval(interval);
         player.states[player.state].onKeyUp(key);
     });
 
@@ -45,6 +45,12 @@ function endClick()
     player.states[player.state].onKeyUp('ArrowRight');
 }
 
+window.addEventListener('keydown', function(e) {
+    player.states[player.state].onKeyDown(e.code);
+});
+window.addEventListener('keyup', function(e) {
+    player.states[player.state].onKeyUp(e.code);
+});
 document.addEventListener('touchend', endClick);
 document.addEventListener('mouseup', endClick);
 
@@ -110,14 +116,19 @@ function startScreenUpdate()
     player.update();
 }
 
-function startScreenDraw()
+function startScreenMessage()
 {
-    drawBackground(true);
-    player.draw(ctx, assets);
     ctx.fillStyle = '#181818';
     ctx.font = `${width * 0.1}px "Jersey 10", sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText('Press any key to start', width / 2, height * 0.3);
+}
+
+function startScreenDraw()
+{
+    drawBackground(true);
+    player.draw(ctx, assets);
+    startScreenMessage();
 }
 
 let shouldStop = false;
@@ -177,6 +188,15 @@ const blackScreenUpdate = () => {
         draw = gameDraw;
     }
 }
+
+function transitionDraw()
+{
+    drawBackground();
+    if (Math.floor(Date.now() / 80) % 2 == 0)
+        startScreenMessage();
+    player.draw(ctx, assets);
+}
+
 const blackScreenDraw = () => {
     drawBackground();
     player.draw(ctx, assets);
@@ -186,18 +206,6 @@ const blackScreenDraw = () => {
     ctx.fillRect(0, 0, width, height);
 }
 
-window.addEventListener('keydown', function(e) {
-    player.states[player.state].onKeyDown(e.code);
-});
-window.addEventListener('keyup', function(e) {
-    player.states[player.state].onKeyUp(e.code);
-});
-
-function transitionDraw()
-{
-    drawBackground();
-    player.draw(ctx, assets);
-}
 
 function restartGame()
 {
@@ -229,10 +237,12 @@ greenButton.addEventListener('touchstart', (e) => {
     greenButton.classList.toggle('button-clicked');
     restartGame();
 });
+
 greenButton.addEventListener('mousedown', (e) => {
     greenButton.classList.toggle('button-clicked');
     restartGame();
 });
+
 greenButton.addEventListener('touchend', (e) => greenButton.classList.toggle('button-clicked'));
 greenButton.addEventListener('mouseup', (e) => greenButton.classList.toggle('button-clicked'));
 
