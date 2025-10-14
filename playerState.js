@@ -323,10 +323,16 @@ const shieldWalkState = (player) => {
         enter: () => {
             player.xVelocity = player.xVelocity * speedModifier;
             player.yVelocity = 0;
-            player.setAnimationId('shield_walk');
+            player.setAnimationId(player.xVelocity == 0 ? 'shield_idle' : 'shield_walk');
         },
         
-        update: () => { player.move(); },
+        update: () => { 
+            player.move();
+            if (player.xVelocity == 0)
+                player.setAnimationId('shield_idle');
+            else
+                player.setAnimationId('shield_walk');
+        },
         
         onKeyUp: (input) => {
             if (input === 'ArrowRight' || input === 'ArrowLeft')

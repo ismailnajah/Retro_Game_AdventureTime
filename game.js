@@ -55,8 +55,8 @@ window.addEventListener('keydown', function(e) {
 window.addEventListener('keyup', function(e) {
     player.states[player.state].onKeyUp(e.code);
 });
-// document.addEventListener('touchend', endClick);
-// document.addEventListener('mouseup', endClick);
+document.addEventListener('touchend', endClick);
+document.addEventListener('mouseup', endClick);
 
 const redButton = document.getElementById('redCircle');
 const blueButton = document.getElementById('blueButton');

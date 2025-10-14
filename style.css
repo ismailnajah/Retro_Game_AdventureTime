@@ -40,7 +40,7 @@ body {
   position: relative;
   margin: 10% 10% 0 10%;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: 5%;
   background-color: #000;
   border: 5px solid #0c3c31cc;
   aspect-ratio: 4 / 3;
@@ -154,11 +154,11 @@ body {
 
 .button{
   /* border: 1px solid #000; */
-  filter: drop-shadow(0px 4px 1px black);
+  filter: drop-shadow(0px 3px 1px black);
 }
 
 .button-clicked{
-  filter: drop-shadow(0px 1px 0px black);
+  filter: drop-shadow(0px 1px 1px black);
 }
 
 #greenCircle{
@@ -167,7 +167,7 @@ body {
   aspect-ratio: 1 / 1;
   background-color: green;
   border-radius: 50%;
-  box-shadow: inset 0px -5px 10px 2px #000000aa;
+  box-shadow: inset 0px -5px 10px -1px #000000aa;
   margin-top: 20%;
   margin-left: 30%;
 }
@@ -209,7 +209,6 @@ body {
   justify-items: center;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  gap: 0%;
 }
 
 #overlay {

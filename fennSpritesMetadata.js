@@ -1750,5 +1750,73 @@ export const fennSpritesMetadata = {
                 "height": 52
             }
         ]
+    },
+    "shield_idle": {
+        "path": "assets/Fenn_sprites/shield_idle_64_10.png",
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 10,
+        "hitboxes": [
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            },
+            {
+                "x": 6,
+                "y": 16,
+                "width": 53,
+                "height": 48
+            }
+        ]
     }
 }

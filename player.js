@@ -174,6 +174,11 @@ function setAnimations()
     anim['jake_roll_in'].repeated = false;
     anim['jake_roll_out'].repeated = false;
 
+    anim['shield_out'].offsetX = 6;
+    anim['shield_in'].offsetX = 6;
+    anim['shield_idle'].offsetX = 6;
+    anim['shield_walk'].offsetX = 6;
+
     anim['sword_out'].offsetX = 14;
     anim['sword_out'].offsetY = -14;
     anim['sword_attack'].offsetX = 14;
