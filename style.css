@@ -76,20 +76,6 @@ body {
   /* display: none; */
 }
 
-
-.animated-pattern {
-  width: 200px;
-  height: 200px;
-  background: repeating-linear-gradient(
-    to bottom,
-    #0af,
-    #0af 4px,
-    transparent 4px,
-    transparent 8px
-  );
-  animation: movePattern 2s linear infinite;
-}
-
 @keyframes movePattern {
   from {
     background-position: 0 0;

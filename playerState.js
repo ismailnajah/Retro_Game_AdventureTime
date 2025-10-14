@@ -470,6 +470,7 @@ const swordAttackState = (player) => {
         enter: () =>
         {
             player.setAnimationId('sword_attack');
+            player.damage = Math.random() < 0.05 ? 50 : 10;
             player.isAttacking = true;
         },
     
@@ -510,6 +511,7 @@ const swordInState = (player) => {
         enter: () => {
             player.setAnimationId('sword_out');
             player.animations[player.animation_id].reverse();
+            player.damage = 10;
             player.isAttacking = false;
         },
         

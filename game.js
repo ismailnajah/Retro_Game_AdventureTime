@@ -3,12 +3,16 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 import { Marceline} from "./marceline.js";
 
+
+
+let gameOver = false;
+let gameStart = false;
 document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
         button.classList.toggle('button-clicked');
-        if (!gameStarted)
+        if (!gameStarted && !gameOver)
             onStart();
         else
             player.states[player.state].onKeyDown(key);
@@ -21,7 +25,7 @@ function setupControl(button, key)
 
     button.addEventListener('mousedown', (e) => {
         button.classList.toggle('button-clicked');
-        if (!gameStarted)
+        if (!gameStart && !gameOver)
             onStart();
         player.states[player.state].onKeyDown(key);
     });
@@ -51,8 +55,8 @@ window.addEventListener('keydown', function(e) {
 window.addEventListener('keyup', function(e) {
     player.states[player.state].onKeyUp(e.code);
 });
-document.addEventListener('touchend', endClick);
-document.addEventListener('mouseup', endClick);
+// document.addEventListener('touchend', endClick);
+// document.addEventListener('mouseup', endClick);
 
 const redButton = document.getElementById('redCircle');
 const blueButton = document.getElementById('blueButton');
@@ -89,7 +93,6 @@ const player = new Player(width / 2, height - 60, width, height);
 const boss = new Marceline(width * 0.8, height - 60, width, height);
 boss.setIdleTimer();
 
-let gameStarted = false;
 let update = startScreenUpdate;
 let draw = startScreenDraw;
 let background;
@@ -104,7 +107,7 @@ async function startGame()
 
 function onStart(e)
 {
-    gameStarted = true;
+    gameStart = true;
     window.removeEventListener('keydown', onStart);
     player.setState('jakeRollIn');
     update = transitionUpdate;
@@ -206,10 +209,9 @@ const blackScreenDraw = () => {
     ctx.fillRect(0, 0, width, height);
 }
 
-
 function restartGame()
 {
-    if (gameStarted) return;
+    if (gameStart) return;
     alpha = 0;
     step = 0.05;
     player.x = width / 2;
@@ -223,7 +225,7 @@ function restartGame()
     boss.setIdleTimer();
 
     background.reset();
-    gameStarted = false;
+    gameStart = false;
     shouldStop = false;
     update = startScreenUpdate;
     draw = startScreenDraw;
@@ -273,7 +275,8 @@ function endGame()
     ctx.textAlign = 'center';
     ctx.font = `${width * 0.2}px "Jersey 10", sans-serif`;
     ctx.fillText('Game Over', width / 2, height / 2);
-    gameStarted = false;
+    gameStart = false;
+    gameOver = true;
 }
 
 function victoryMessage()
@@ -284,7 +287,8 @@ function victoryMessage()
     ctx.fillText('You Win!', width / 2, height / 2);
     ctx.font = `${width * 0.07}px "Jersey 10", sans-serif`;
     ctx.fillText('Marceline is calm again.', width / 2, height / 2 + 30);
-    gameStarted = false;
+    gameStart = false;
+    gameOver = true;
 }
 
 function gameUpdate(deltaTime)
@@ -300,7 +304,6 @@ function gameDraw()
     ctx.clearRect(0, 0, width, height);
     drawBackground();
     drawHpBar();
-    // player.draw(ctx, assets);
     boss.drawHpBar(ctx);
     if (boss.isAttacking)
     {
@@ -333,7 +336,7 @@ function drawHpBar()
     const w = bar.width;
     ctx.save();
     ctx.scale(0.5, 0.5);
-    const h = bar.height / 9; // include empty part
+    const h = bar.height / 9;
     let hp = 8 - player.hp;
 
     if (flickerTimer > 0)
