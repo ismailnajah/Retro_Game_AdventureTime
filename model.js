@@ -16,8 +16,6 @@ document.body.appendChild(renderer.domElement);
 const screenHeight = 5;
 camera.position.set(0, 0, 400);
 
-
-
 const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
 const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, side: THREE.DoubleSide });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);

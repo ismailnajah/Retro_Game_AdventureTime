@@ -11,8 +11,9 @@ document.addEventListener('contextmenu', event => event.preventDefault());
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
+        console.log('touchstart');
         button.classList.toggle('button-clicked');
-        if (!gameStarted && !gameOver)
+        if (!gameStart && !gameOver)
             onStart();
         else
             player.states[player.state].onKeyDown(key);
