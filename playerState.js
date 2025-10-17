@@ -8,24 +8,24 @@ const idleState = (player) => {
         onKeyDown: (input) => {
             switch (input)
             {
-                case 'ArrowRight':
+                case 'arrowright':
                     player.state = 'running';
                     player.direction = 'right';
                     break;
-                case 'ArrowLeft':
+                case 'arrowleft':
                     player.state = 'running';
                     player.direction = 'left';
                     break;
-                case 'ArrowUp':
+                case 'arrowup':
                     player.state = 'jumping';
                     break;
-                case 'ArrowDown':
+                case 'arrowdown':
                     player.state = 'ducking';
                     break;
-                case 'KeyG':
+                case 'g':
                     player.state = 'shieldOut';
                     break;
-                case 'Space':
+                case 'space':
                     player.state = 'swordOut';
                     break;
                 default:
@@ -113,7 +113,7 @@ const runningState = (player) => {
         
         onKeyUp: (input) =>
         {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return;
             player.setState('idle');
         },
@@ -122,22 +122,22 @@ const runningState = (player) => {
         {
             switch (input)
             {
-                case 'ArrowRight':
+                case 'arrowright':
                     player.direction = 'right';
                     break;
-                case 'ArrowLeft':
+                case 'arrowleft':
                     player.direction = 'left';
                     break;
-                case 'ArrowUp':
+                case 'arrowup':
                     player.setState('jumping');
                     break;
-                case 'ArrowDown':
+                case 'arrowdown':
                     player.setState('ducking');
                     break;
-                case 'KeyG':
+                case 'g':
                     player.setState('shieldOut');
                     break;
-                case 'Space':
+                case 'space':
                     player.setState('swordOut');
                     break;
                 default:
@@ -168,15 +168,15 @@ const jumpingState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return;
             player.xVelocity = 0;
         },
     
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
         },
     } 
 }
@@ -203,15 +203,15 @@ const fallingState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
             player.xVelocity = 0; 
         },
         
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.xVelocity = player.speed;
         },
     }
@@ -236,9 +236,9 @@ const landingState = (player) => {
         onKeyUp: (input) => {},
     
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
         },
     }    
 }
@@ -264,7 +264,7 @@ const duckingState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input !== 'ArrowDown')
+            if (input !== 'arrowdown')
                 return;
             player.animations[player.animation_id].reverse();
             standing = true;
@@ -272,9 +272,9 @@ const duckingState = (player) => {
     
         onKeyDown: (input) =>
         {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
         },
     }
 }
@@ -297,9 +297,9 @@ const shieldOutState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input === 'ArrowRight' || input === 'ArrowLeft')
+            if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
-            if (input === 'KeyG')
+            if (input === 'g')
             {
                 player.state = 'shieldIn';
                 player.states[player.state].enter();
@@ -307,9 +307,9 @@ const shieldOutState = (player) => {
         },
         
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.state = 'shieldWalk';
             player.states[player.state].enter();
         },
@@ -335,9 +335,9 @@ const shieldWalkState = (player) => {
         },
         
         onKeyUp: (input) => {
-            if (input === 'ArrowRight' || input === 'ArrowLeft')
+            if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
-            if (input === 'KeyG')
+            if (input === 'g')
             {
                 player.state = 'shieldIn';
                 player.states[player.state].enter();
@@ -345,9 +345,9 @@ const shieldWalkState = (player) => {
         },
 
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.xVelocity = player.speed / 2;
         },
     }
@@ -371,15 +371,15 @@ const shieldInState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
             player.xVelocity = 0;
         },
     
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
         },
     }
 }
@@ -454,16 +454,16 @@ const swordOutState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input === 'Space')
+            if (input === 'space')
                 player.shouldCombo = false;
-            if (input === 'ArrowRight' || input === 'ArrowLeft')
+            if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
         },
 
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.xVelocity = player.speed;
         },
     }
@@ -496,17 +496,17 @@ const swordAttackState = (player) => {
         },
     
         onKeyUp: (input) => {
-            if (input === 'Space')
+            if (input === 'space')
                 player.shouldCombo = false;
-            if (input === 'ArrowRight' || input === 'ArrowLeft')
+            if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
         },
     
         onKeyDown: (input) =>
         {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.xVelocity = player.speed;
         },
     }
@@ -528,15 +528,15 @@ const swordInState = (player) => {
         },
 
         onKeyUp: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
             player.xVelocity = 0;
         },
 
         onKeyDown: (input) => {
-            if (input !== 'ArrowRight' && input !== 'ArrowLeft')
+            if (input !== 'arrowright' && input !== 'arrowleft')
                 return ;
-            player.direction = input === 'ArrowRight' ? 'right' : 'left';
+            player.direction = input === 'arrowright' ? 'right' : 'left';
             player.xVelocity = player.speed;
         },
     }
