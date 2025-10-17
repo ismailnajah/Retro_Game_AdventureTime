@@ -1,68 +1,99 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js";
+import * as THREE from 'https://unpkg.com/three@0.168.0/build/three.module.js?module';
+import { GLTFLoader } from 'https://unpkg.com/three@0.168.0/examples/jsm/loaders/GLTFLoader.js?module';
+import { DRACOLoader } from 'https://unpkg.com/three@0.168.0/examples/jsm/loaders/DRACOLoader.js?module';
 
+
+const model_path = "3D_models/bmo_fixed_textures.glb";
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.5, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 
-camera.position.set(0, 0, 400);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight2.position.set(0, 100, 50);
+const directionalLight1 = new THREE.DirectionalLight(0xff5599, 5);
+directionalLight1.position.set(-50, -20, 10);
+scene.add(directionalLight1);
+const directionalLight2 = new THREE.DirectionalLight(0x5599ff, 5);
+directionalLight2.position.set(50, 20, 10);
 scene.add(directionalLight2);
 
-function fitCameraToObject(camera, object, offset = 0.9) {
-  const box = new THREE.Box3().setFromObject(object);
+const directionalLight3 = new THREE.DirectionalLight(0xffffff, 5);
+directionalLight3.position.set(0, 100, 100);
+scene.add(directionalLight3);
 
+// ---------------------------------------------------------------
+// respnonsive model fitting
+function fitCameraToObject(camera, object, offsetH = 1.2, offsetW = 1.1) {
+  const box = new THREE.Box3().setFromObject(object);
   const size = new THREE.Vector3();
   box.getSize(size);
   const center = new THREE.Vector3();
   box.getCenter(center);
 
-  const maxSize = Math.max(size.x, size.y);
-  const fitHeightDistance = maxSize / (2 * Math.tan((camera.fov * Math.PI / 180) / 2));
-  const fitWidthDistance = fitHeightDistance / camera.aspect;
-  const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
-  const direction = new THREE.Vector3(0, 0, -1);
-  
-  camera.position.copy(center).addScaledVector(direction, -distance);
+  const fov = THREE.MathUtils.degToRad(camera.fov);
+  const aspect = window.innerWidth / window.innerHeight;
+  let distance;
+
+  if (aspect > 0.75)
+    distance = (size.y / 2) / Math.tan(fov / 2) * offsetH;
+  else
+    distance = size.x / (2 * Math.tan(fov / 2) * aspect) * offsetW;
+
+  // Position camera
+  const dir = new THREE.Vector3(0, 0, 1);
+  camera.position.copy(center.clone().addScaledVector(dir, distance));
   camera.lookAt(center);
+  camera.near = distance / 100;
+  camera.far = distance * 100;
+  camera.updateProjectionMatrix();
 }
 
+// Resize handling
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  fitCameraToObject(camera, bmo_body);
+});
+//---------------------------------------------------------------  
 
-const loader = new GLTFLoader();
+// load model
+let model = null;
 let plus_button = undefined;
 let bmo_body = undefined;
 let bmo_screen = undefined;
-
 const canvas = document.getElementById('gameCanvas');
 const gameTexture = new THREE.CanvasTexture(canvas);
 gameTexture.needsUpdate = true;
 
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); // Google-hosted Draco
+const loader = new GLTFLoader();
+loader.setDRACOLoader(dracoLoader);
+
 loader.load(
-  '3D_models/bmo.glb', // path to your model
+  model_path,
   (gltf) => {
-    const model = gltf.scene;
+    model = gltf.scene;
     model.children = model.children.filter(child => child.name !== "eyes");
     console.log(model.children);
-    // showBoundingBox(model, 0x0000ff);
-    bmo_body = model.children.find(child => child.name === "Body");
-    // showBoundingBox(bmo_body, 0xff0000);
+    model.scale.set(1000, 1000, 1000);
+    model.updateWorldMatrix(true, true);
+    bmo_body = model.getObjectByName("Body");
     plus_button = model.getObjectByName("plus_button");
-    bmo_screen = model.getObjectByName("screen2");
-    gameTexture.repeat.set(1, -1); // Flip the texture vertically
-    gameTexture.offset.set(0, 1); 
-    fitCameraToObject(camera, bmo_body);
-    if (bmo_screen) {
+    bmo_screen = model.getObjectByName("screen");
+    gameTexture.repeat.set(-1, 1);
+    gameTexture.offset.set(0, 0);
+    gameTexture.center = new THREE.Vector2(0.5, 0.5);
+    gameTexture.rotation = -Math.PI / 2;
+    if (bmo_screen) 
       bmo_screen.material = new THREE.MeshBasicMaterial({ map: gameTexture});
-    }
+    fitCameraToObject(camera, bmo_body);
     scene.add(model);
   },
   (xhr) => {
@@ -73,14 +104,8 @@ loader.load(
   }
 );
 
-// Resize handling
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  fitCameraToObject(camera, bmo_body);
-});
-
+//---------------------------------------------------------------
+// handle keyboard input and touch events
 const keysPressed = {};
 
 window.addEventListener('keydown', (event) => {
@@ -90,8 +115,6 @@ window.addEventListener('keydown', (event) => {
 window.addEventListener('keyup', (event) => {
   keysPressed[event.key.toLowerCase()] = false;
 });
-
-
 
 function handleKeys() {
   const angle = 0.08;
@@ -111,45 +134,64 @@ function handleKeys() {
     plus_button.rotation.y = 0;
 }
 
-let touches = {}
+// Raycasting for touch and mouse interaction
 
-window.addEventListener('touchstart', (e) => {
-  touches = e.touches;
-})
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
 
-window.addEventListener('touchend', (e) => { touches = e.touches; });
+renderer.domElement.addEventListener('mousedown', onPointerDown);
+renderer.domElement.addEventListener('touchstart', onPointerDown);
 
-function handleTouch()
+function onPointerDown(event)
 {
-}
-
-function showBoundingBox(object, color = 0x00ff00) {
-  // Remove previous bounding box if it exists
-  if (object.userData.bboxHelper) {
-    object.remove(object.userData.bboxHelper);
-  }
-
-  // Create a new BoxHelper around the object
-  const boxHelper = new THREE.BoxHelper(object, color);
-  object.userData.bboxHelper = boxHelper; // store reference for easy cleanup
-
-  // Add it to the same scene (or object’s parent)
-  if (object.parent) {
-    object.parent.add(boxHelper);
+  event.preventDefault();
+  let x, y;
+  if (event.touches && event.touches.length > 0) {
+    x = event.touches[0].clientX;
+    y = event.touches[0].clientY;
   } else {
-    scene.add(boxHelper);
+    x = event.clientX;
+    y = event.clientY;
   }
 
-  return boxHelper;
+  mouse.x = (x / window.innerWidth) * 2 - 1;
+  mouse.y = - (y / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+  if (intersects.length > 0)
+    controls(intersects[0]);
 }
 
+function controlPressFeedBack(intersection)
+{
+  const point = intersection.point;
+  const button = intersection.object;
+  const xAxis = new THREE.Vector3(button.position.x - point.x, button.position.y - point.y, 0).normalize();
+  const yAxis = new THREE.Vector3().crossVectors(xAxis, new THREE.Vector3(0, 1, 0)).normalize();
+
+  const yline = drawLineFromVector(yAxis, 2, 0xff0000);
+  scene.add(yline);
+  const xline = drawLineFromVector(xAxis, 2, 0x0000ff);
+  scene.add(xline);
+
+  // button.rotateOnAxis(yAxis, 0.1);
+}
+
+function controls(intersect) {
+  console.log(intersect)
+  if (intersect.object.name === "plus_button") {
+    controlPressFeedBack(intersect);
+  }
+}
+
+// ---------------------------------------------------------------
 
 // Animation loop
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   handleKeys();
-  handleTouch();
   gameTexture.needsUpdate = true;
 }
 
