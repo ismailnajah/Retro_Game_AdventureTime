@@ -151,6 +151,7 @@ function restartGame()
     player.x = width / 2;
     player.y = height - 60;
     player.reset();
+    player.hp = 1;
     player.setState('walking');
 
     boss.x = width * 0.8;
@@ -160,6 +161,7 @@ function restartGame()
 
     background.reset();
     gameStart = false;
+    gameOver = false;
     shouldStop = false;
     update = startScreenUpdate;
     draw = startScreenDraw;
@@ -405,7 +407,13 @@ const handlers = {
     plus_button: DPad,
     Red_button: (intersect, pressed) => { onKeyEvent('space', pressed);},
     triangle_button: (intersect, pressed) => { onKeyEvent('g', pressed);},
-    small_button: (intersect, pressed) => { onKeyEvent('r', pressed); },
+    small_button: (intersect, pressed) => {
+      keysPressed['r'] = pressed;
+      if (keysPressed['r'] && !gameStart && gameOver)
+        restartGame();
+      else if (keysPressed['r'] && !gameStart)
+        onStart();
+    },
 }
 
 function handleKeys() {
@@ -432,11 +440,6 @@ function handleKeys() {
   red_button.position.z = keysPressed['space'] ?  z + zOffset : z;
   blue_button.position.z = keysPressed['g'] ? z + zOffset : z;
   green_button.position.z = keysPressed['r'] ? z + zOffset : z;
-
-  if (keysPressed['r'] && !gameStart && gameOver)
-    restartGame();
-  else if (keysPressed['r'] && !gameStart)
-    onStart();
 }
 
 function onKeyEvent(key, pressed) {
