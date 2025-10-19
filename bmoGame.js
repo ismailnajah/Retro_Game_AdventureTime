@@ -276,6 +276,8 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.5, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.noToneMapping;
 document.body.appendChild(renderer.domElement);
 
 
@@ -340,6 +342,7 @@ let bmo_body = undefined;
 let bmo_screen = undefined;
 // const canvas = document.getElementById('gameCanvas');
 const gameTexture = new THREE.CanvasTexture(canvas);
+gameTexture.colorSpace = THREE.SRGBColorSpace;
 gameTexture.needsUpdate = true;
 
 const dracoLoader = new DRACOLoader();
