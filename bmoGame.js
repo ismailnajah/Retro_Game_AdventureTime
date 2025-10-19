@@ -6,6 +6,7 @@ import { Player } from "./player.js";
 import { Background } from "./background.js";
 import { Marceline} from "./marceline.js";
 
+document.addEventListener('contextmenu', event => event.preventDefault());
 
 let gameOver = false;
 let gameStart = false;
@@ -57,7 +58,7 @@ function startScreenMessage()
     ctx.fillStyle = '#181818';
     ctx.font = `${width * 0.1}px "Jersey 10", sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('Press any key to start', width / 2, height * 0.3);
+    ctx.fillText('Press GREEN to start', width / 2, height * 0.3);
 }
 
 function startScreenDraw()
@@ -115,12 +116,6 @@ const blackScreenUpdate = () => {
     player.update();
     if (player.state === 'idle')
     {
-        window.addEventListener('keydown', function(e) {
-            player.states[player.state].onKeyDown(e.code);
-        });
-        window.addEventListener('keyup', function(e) {
-            player.states[player.state].onKeyUp(e.code);
-        });
         update = gameUpdate;
         draw = gameDraw;
     }
@@ -151,7 +146,6 @@ function restartGame()
     player.x = width / 2;
     player.y = height - 60;
     player.reset();
-    player.hp = 1;
     player.setState('walking');
 
     boss.x = width * 0.8;
@@ -388,16 +382,15 @@ loader.load(
 const keysPressed = {};
 
 window.addEventListener('keydown', (event) => {
-  keysPressed[event.key.toLowerCase()] = true;
+  onKeyEvent(event.code.toLowerCase(), true);
 });
 
 window.addEventListener('keyup', (event) => {
-  keysPressed[event.key.toLowerCase()] = false;
+  onKeyEvent(event.code.toLowerCase(), false);
 });
 
 renderer.domElement.addEventListener('mousedown', onPointerDown);
 renderer.domElement.addEventListener('touchstart', onPointerDown);
-
 
 renderer.domElement.addEventListener('mouseup', onPointerUp);
 renderer.domElement.addEventListener('touchend', onPointerUp);
@@ -406,12 +399,12 @@ renderer.domElement.addEventListener('touchend', onPointerUp);
 const handlers = {
     plus_button: DPad,
     Red_button: (intersect, pressed) => { onKeyEvent('space', pressed);},
-    triangle_button: (intersect, pressed) => { onKeyEvent('g', pressed);},
+    triangle_button: (intersect, pressed) => { onKeyEvent('keyg', pressed);},
     small_button: (intersect, pressed) => {
-      keysPressed['r'] = pressed;
-      if (keysPressed['r'] && !gameStart && gameOver)
+      keysPressed['keyr'] = pressed;
+      if (keysPressed['keyr'] && !gameStart && gameOver)
         restartGame();
-      else if (keysPressed['r'] && !gameStart)
+      else if (keysPressed['keyr'] && !gameStart)
         onStart();
     },
 }
@@ -420,16 +413,16 @@ function handleKeys() {
   const angle = 0.1;
 
   if (!plus_button) return;
-  if (keysPressed['arrowup'] || keysPressed['w'])
+  if (keysPressed['arrowup'] || keysPressed['keyw'])
     plus_button.rotation.x = -angle;
-  else if (keysPressed['arrowdown'] || keysPressed['s'])
+  else if (keysPressed['arrowdown'] || keysPressed['keys'])
     plus_button.rotation.x = angle;
   else
     plus_button.rotation.x = 0;
 
-  if (keysPressed['arrowleft'] || keysPressed['a'])
+  if (keysPressed['arrowleft'] || keysPressed['keya'])
     plus_button.rotation.y = -angle;
-  else if (keysPressed['arrowright'] || keysPressed['d'])
+  else if (keysPressed['arrowright'] || keysPressed['keyd'])
     plus_button.rotation.y = angle;
   else
     plus_button.rotation.y = 0;
@@ -438,12 +431,12 @@ function handleKeys() {
   const zOffset = -0.005;
 
   red_button.position.z = keysPressed['space'] ?  z + zOffset : z;
-  blue_button.position.z = keysPressed['g'] ? z + zOffset : z;
-  green_button.position.z = keysPressed['r'] ? z + zOffset : z;
+  blue_button.position.z = keysPressed['keyg'] ? z + zOffset : z;
+  green_button.position.z = keysPressed['keyr'] ? z + zOffset : z;
 }
 
 function onKeyEvent(key, pressed) {
-    keysPressed[key.toLowerCase()] = pressed;
+    keysPressed[key] = pressed;
     if (pressed)
         player.states[player.state].onKeyDown(key);
     else

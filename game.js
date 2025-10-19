@@ -4,10 +4,10 @@ import { Background } from "./background.js";
 import { Marceline} from "./marceline.js";
 
 
-
 let gameOver = false;
 let gameStart = false;
 document.addEventListener('contextmenu', event => event.preventDefault());
+
 function setupControl(button, key)
 {
     button.addEventListener('touchstart', (e) => {
@@ -42,36 +42,39 @@ function endClick()
     for(let button of document.getElementsByClassName('button-clicked'))
         button.classList.toggle('button-clicked');
 
-    player.states[player.state].onKeyUp('Space');
-    player.states[player.state].onKeyUp('KeyG');
-    player.states[player.state].onKeyUp('ArrowUp');
-    player.states[player.state].onKeyUp('ArrowDown');
-    player.states[player.state].onKeyUp('ArrowLeft');
-    player.states[player.state].onKeyUp('ArrowRight');
+    player.states[player.state].onKeyUp('space');
+    player.states[player.state].onKeyUp('keyg');
+    player.states[player.state].onKeyUp('arrowup');
+    player.states[player.state].onKeyUp('arrowdown');
+    player.states[player.state].onKeyUp('arrowleft');
+    player.states[player.state].onKeyUp('arrowright');
 }
 
 window.addEventListener('keydown', function(e) {
-    player.states[player.state].onKeyDown(e.code);
+    player.states[player.state].onKeyDown(e.code.toLowerCase());
 });
+
 window.addEventListener('keyup', function(e) {
-    player.states[player.state].onKeyUp(e.code);
+    player.states[player.state].onKeyUp(e.code.toLowerCase());
 });
+
 document.addEventListener('touchend', endClick);
 document.addEventListener('mouseup', endClick);
 
 const redButton = document.getElementById('redCircle');
 const blueButton = document.getElementById('blueButton');
 
-setupControl(redButton, 'Space');
-setupControl(blueButton, 'KeyG');
+setupControl(redButton, 'space');
+setupControl(blueButton, 'keyg');
 
 
 const keys = {
-    'upArrow': 'ArrowUp',
-    'downArrow': 'ArrowDown',
-    'leftArrow': 'ArrowLeft',
-    'rightArrow': 'ArrowRight'
+    'upArrow': 'arrowup',
+    'downArrow': 'arrowdown',
+    'leftArrow': 'arrowleft',
+    'rightArrow': 'arrowright'
 };
+
 for (let arrow of document.getElementsByClassName('arrow'))
 {
     setupControl(arrow, keys[arrow.id]);
@@ -151,12 +154,6 @@ function transitionUpdate()
     player.update();
     if (player.state === 'idle')
     {
-        window.addEventListener('keydown', function(e) {
-            player.states[player.state].onKeyDown(e.code);
-        });
-        window.addEventListener('keyup', function(e) {
-            player.states[player.state].onKeyUp(e.code);
-        });
         update = gameUpdate;
         draw = gameDraw;
     }
@@ -183,10 +180,10 @@ const blackScreenUpdate = () => {
     if (player.state === 'idle')
     {
         window.addEventListener('keydown', function(e) {
-            player.states[player.state].onKeyDown(e.code);
+            player.states[player.state].onKeyDown(e.code.toLowerCase());
         });
         window.addEventListener('keyup', function(e) {
-            player.states[player.state].onKeyUp(e.code);
+            player.states[player.state].onKeyUp(e.code.toLowerCase());
         });
         update = gameUpdate;
         draw = gameDraw;

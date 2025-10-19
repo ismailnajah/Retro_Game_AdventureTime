@@ -22,7 +22,7 @@ const idleState = (player) => {
                 case 'arrowdown':
                     player.state = 'ducking';
                     break;
-                case 'g':
+                case 'keyg':
                     player.state = 'shieldOut';
                     break;
                 case 'space':
@@ -134,7 +134,7 @@ const runningState = (player) => {
                 case 'arrowdown':
                     player.setState('ducking');
                     break;
-                case 'g':
+                case 'keyg':
                     player.setState('shieldOut');
                     break;
                 case 'space':
@@ -299,7 +299,7 @@ const shieldOutState = (player) => {
         onKeyUp: (input) => {
             if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
-            if (input === 'g')
+            if (input === 'keyg')
             {
                 player.state = 'shieldIn';
                 player.states[player.state].enter();
@@ -337,7 +337,7 @@ const shieldWalkState = (player) => {
         onKeyUp: (input) => {
             if (input === 'arrowright' || input === 'arrowleft')
                 player.xVelocity = 0;
-            if (input === 'g')
+            if (input === 'keyg')
             {
                 player.state = 'shieldIn';
                 player.states[player.state].enter();
